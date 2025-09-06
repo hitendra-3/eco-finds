@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>All Products</title>
+  <style>
+    .nav a { margin-right: 15px; }
+    .product-card { border: 1px solid #ccc; padding: 15px; margin: 15px 0; border-radius: 4px; }
+    .product-card img { max-width: 120px; margin-right: 8px; }
+    .flash-success { color: green; }
+    .flash-error { color: red; }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <a href="{{ url_for('dashboard') }}">Dashboard</a>
+    <a href="{{ url_for('my_products') }}">My Products</a>
+    <a href="{{ url_for('add_product') }}">Add New Product</a>
+    <a href="{{ url_for('all_products') }}">All Products</a>
+    <a href="{{ url_for('logout') }}">Logout</a>
+  </nav>
+
+  <h1>Available Products</h1>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, msg in messages %}
+        <p class="flash-{{ category }}">{{ msg }}</p>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  {% if products %}
+    {% for product in products %}
+      <div class="product-card">
+        <h2>{{ product.title }}</h2>
+        <p><strong>Category:</strong> {{ product.category or '—' }}</p>
+        <p><strong>Price:</strong> ₹{{ product.price }}</p>
+        <p><strong>Description:</strong> {{ product.description or 'N/A' }}</p>
+        <p><strong>Seller:</strong> {{ product.seller_name }} ({{ product.seller_email }})</p>
+        <div>
+          {% for img in product.images %}
+            <img src="{{ url_for('static', filename=img) }}" alt="Product image">
+          {% endfor %}
+        </div>
+
+        {% if product.user_id != session.user_id %}
+          <form method="POST" action="{{ url_for('buy_product', product_id=product.id) }}">
+            <button type="submit">Buy</button>
+          </form>
+        {% else %}
+          <p><em>You added this product.</em></p>
+        {% endif %}
+      </div>
+    {% endfor %}
+  {% else %}
+    <p>No products available at this time.</p>
+  {% endif %}
+</body>
+</html>

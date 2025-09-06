@@ -569,6 +569,137 @@ def delete_product(product_id):
     flash("Product deleted successfully", "success")
     return redirect(url_for("my_products"))
 
+@app.route("/all-products")
+def all_products():
+    if "user_id" not in session:
+        return redirect(url_for("login_page"))
+
+    conn = get_db_connection()
+    cur = conn.cursor(dictionary=True)
+
+    try:
+        cur.execute("""
+            SELECT
+                p.id, p.title, p.description, p.category, p.price,
+                u.name AS seller_name, u.email AS seller_email
+            FROM products p
+            JOIN users u ON p.user_id = u.id
+            ORDER BY p.created_at DESC
+        """)
+        products = cur.fetchall()
+
+        # Debug: check data in console
+        print(f"[DEBUG] fetched {len(products)} products")
+
+        for product in products:
+            cur.execute(
+                "SELECT image_path FROM product_images WHERE product_id=%s",
+                (product["id"],)
+            )
+            imgs = cur.fetchall()
+            product["images"] = [i["image_path"] for i in imgs]
+
+        return render_template("all_products.html", products=products)
+
+    except Exception as e:
+        print("Error in all_products route:", e)
+        flash("Failed to load products.", "error")
+        return render_template("all_products.html", products=[])
+
+    finally:
+        cur.close()
+        conn.close()
+
+@app.route("/buy-product/<int:product_id>", methods=["POST"])
+def buy_product(product_id):
+    if "user_id" not in session:
+        flash("You must be logged in to express interest.", "error")
+        return redirect(url_for("login_page"))
+
+    buyer_id = session["user_id"]
+
+    conn = None
+    cur = None
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor(dictionary=True)
+
+        # Fetch product and seller details
+        cur.execute("""
+            SELECT p.title, u.name AS seller_name, u.email AS seller_email
+            FROM products p
+            JOIN users u ON p.user_id = u.id
+            WHERE p.id = %s
+        """, (product_id,))
+        product = cur.fetchone()
+        if not product:
+            flash("Product not found.", "error")
+            return redirect(url_for("all_products"))
+
+        # Fetch buyer details
+        cur.execute(
+            "SELECT name, email FROM users WHERE id = %s",
+            (buyer_id,)
+        )
+        buyer = cur.fetchone()
+        if not buyer:
+            flash("Buyer information not found.", "error")
+            return redirect(url_for("all_products"))
+
+        # Compose email
+        subject = f"[EcoFinds] Interest in \"{product['title']}\""
+        body = f"""Hello {product['seller_name']},
+
+You have a buyer interested in your product:
+
+Product: {product['title']}
+Buyer: {buyer['name']} ({buyer['email']})
+
+Please contact them to proceed.
+
+Thank you for using EcoFinds!
+"""
+        print(f"[DEBUG] Sending email to {product['seller_email']}")
+        send_email_otp(product['seller_email'], body, subject_override=subject)
+
+        flash("Your interest has been sent to the seller!", "success")
+        return redirect(url_for("all_products"))
+
+    except Exception as err:
+        print("Buy route error:", err)
+        flash("Failed to send interest. Please try again later.", "error")
+        return redirect(url_for("all_products"))
+
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
+
+def send_email_otp(to_email, message, subject_override=None):
+    SMTP_HOST = os.getenv("SMTP_HOST")
+    SMTP_PORT = int(os.getenv("SMTP_PORT", 587))
+    SMTP_USER = os.getenv("SMTP_USER")
+    SMTP_PASS = os.getenv("SMTP_PASS")
+
+    if not SMTP_USER or not SMTP_PASS:
+        print("SMTP credentials not set; skipping email.")
+        return
+
+    msg = EmailMessage()
+    msg["Subject"] = subject_override or "EcoFinds Notification"
+    msg["From"] = SMTP_USER
+    msg["To"] = to_email
+    msg.set_content(message)
+
+    try:
+        with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as smtp:
+            smtp.starttls()
+            smtp.login(SMTP_USER, SMTP_PASS)
+            smtp.send_message(msg)
+    except Exception as e:
+        print("Email send failure:", e)
+
 # ---------- RUN ----------
 if __name__ == "__main__":
     app.run(debug=True)
