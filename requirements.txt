@@ -1,0 +1,7 @@
+Flask
+flask-mysql-connector
+Flask-JWT-Extended
+Flask-Mail
+python-dotenv
+bcrypt
+twilio

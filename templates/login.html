@@ -1,0 +1,67 @@
+<!-- templates/login.html -->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Login</title>
+</head>
+<body>
+  <h2>Login</h2>
+  <form id="loginForm">
+    <label>Email:</label><br>
+    <input type="email" id="email" required><br>
+    <label>Password:</label><br>
+    <input type="password" id="password" required><br><br>
+    <button type="submit">Login</button>
+  </form>
+  <p><a href="/register-page">Don't have an account? Register</a></p>
+  <p><a href="#" onclick="showForgot()">Forgot Password?</a></p>
+
+  <div id="forgotSection" style="display:none;">
+    <h3>Forgot Password</h3>
+    <input type="email" id="forgotEmail" placeholder="Enter your email">
+    <button onclick="sendForgotOTP()">Send OTP</button>
+  </div>
+
+  <script>
+    document.getElementById("loginForm").onsubmit = async function(e) {
+      e.preventDefault();
+      const res = await fetch("/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: document.getElementById("email").value,
+          password: document.getElementById("password").value
+        })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        alert("Login successful");
+        window.location.href = "/dashboard";  // You'll create this route
+      } else {
+        alert(data.error || "Login failed");
+      }
+    };
+
+    function showForgot() {
+      document.getElementById("forgotSection").style.display = "block";
+    }
+
+    async function sendForgotOTP() {
+      const email = document.getElementById("forgotEmail").value;
+      const res = await fetch("/forgot-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        alert("OTP sent to email");
+        sessionStorage.setItem("user_id", data.user_id);
+        window.location.href = "/verify-forgot-page";
+      } else {
+        alert(data.error);
+      }
+    }
+  </script>
+</body>
+</html>

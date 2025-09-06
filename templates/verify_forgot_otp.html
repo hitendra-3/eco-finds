@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Verify Forgot Password OTP</title>
+</head>
+<body>
+    <h1>Verify OTP for Password Reset</h1>
+    <form id="verify-otp-form">
+        <label>User ID: <input type="text" name="user_id" required /></label><br />
+        <label>OTP: <input type="text" name="otp" required /></label><br />
+        <button type="submit">Verify OTP</button>
+    </form>
+    <script>
+        document.getElementById('verify-otp-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = {
+                user_id: formData.get('user_id'),
+                otp: formData.get('otp')
+            };
+
+            const res = await fetch('/verify-forgot-otp', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            });
+
+            const result = await res.json();
+            alert(result.message || result.error);
+            if(res.ok) {
+                // Redirect to reset password page if OTP verified
+                window.location.href = "/reset-password-page";
+            }
+        });
+    </script>
+</body>
+</html>
