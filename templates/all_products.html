@@ -3,58 +3,626 @@
 <head>
   <meta charset="UTF-8">
   <title>All Products</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    .nav a { margin-right: 15px; }
-    .product-card { border: 1px solid #ccc; padding: 15px; margin: 15px 0; border-radius: 4px; }
-    .product-card img { max-width: 120px; margin-right: 8px; }
-    .flash-success { color: green; }
-    .flash-error { color: red; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    body {
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      color: #334155;
+      padding: 2rem;
+      transition: all 0.3s ease;
+      min-height: 100vh;
+    }
+    
+    body.dark-mode {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      color: #cbd5e1;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid #2E8B57;
+    }
+    
+    .dark-mode .header {
+      border-bottom-color: #3cb371;
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+    }
+    
+    .logo-icon {
+      font-size: 2.5rem;
+      color: #2E8B57;
+      margin-right: 0.75rem;
+      transition: color 0.3s;
+    }
+    
+    .dark-mode .logo-icon {
+      color: #3cb371;
+    }
+    
+    .logo-text {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #2E8B57;
+      transition: color 0.3s;
+    }
+    
+    .dark-mode .logo-text {
+      color: #3cb371;
+    }
+    
+    h1 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      color: #1e293b;
+      transition: color 0.3s;
+      text-align: center;
+      position: relative;
+      padding-bottom: 15px;
+    }
+    
+    h1::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 4px;
+      background: linear-gradient(90deg, #2E8B57, #3cb371);
+      border-radius: 2px;
+    }
+    
+    .dark-mode h1 {
+      color: #f1f5f9;
+    }
+    
+    .nav {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+    
+    .nav a {
+      color: #2E8B57;
+      text-decoration: none;
+      font-weight: 600;
+      padding: 0.5rem 1rem;
+      border-radius: 30px;
+      transition: all 0.3s;
+      border: 2px solid #2E8B57;
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+      margin-right: 0;
+    }
+    
+    .nav a::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: #2E8B57;
+      transition: all 0.4s;
+      z-index: -1;
+    }
+    
+    .nav a:hover::before {
+      left: 0;
+    }
+    
+    .nav a:hover {
+      color: white;
+    }
+    
+    .dark-mode .nav a {
+      color: #3cb371;
+      border-color: #3cb371;
+    }
+    
+    .dark-mode .nav a::before {
+      background: #3cb371;
+    }
+    
+    .dark-mode .nav a:hover {
+      color: white;
+    }
+    
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 2rem;
+      padding: 1rem 0;
+    }
+    
+    .product-card {
+      border: 3px solid #2E8B57;
+      border-radius: 16px;
+      padding: 1.8rem;
+      background-color: white;
+      transition: all 0.3s ease;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .product-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 5px;
+      background: linear-gradient(90deg, #2E8B57, #3B82F6, #F59E0B, #8B5CF6);
+    }
+    
+    .product-card:nth-child(4n+1) {
+      border-color: #2E8B57;
+    }
+    
+    .product-card:nth-child(4n+2) {
+      border-color: #3B82F6;
+    }
+    
+    .product-card:nth-child(4n+3) {
+      border-color: #F59E0B;
+    }
+    
+    .product-card:nth-child(4n+4) {
+      border-color: #8B5CF6;
+    }
+    
+    .product-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
+    }
+    
+    .product-card:nth-child(4n+1):hover {
+      box-shadow: 0 12px 20px rgba(46, 139, 87, 0.2);
+    }
+    
+    .product-card:nth-child(4n+2):hover {
+      box-shadow: 0 12px 20px rgba(59, 130, 246, 0.2);
+    }
+    
+    .product-card:nth-child(4n+3):hover {
+      box-shadow: 0 12px 20px rgba(245, 158, 11, 0.2);
+    }
+    
+    .product-card:nth-child(4n+4):hover {
+      box-shadow: 0 12px 20px rgba(139, 92, 246, 0.2);
+    }
+    
+    .dark-mode .product-card {
+      background-color: #334155;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+    }
+    
+    .dark-mode .product-card:hover {
+      box-shadow: 0 12px 20px rgba(0, 0, 0, 0.25);
+    }
+    
+    .product-card h2 {
+      font-size: 1.5rem;
+      color: #1e293b;
+      margin-bottom: 1.2rem;
+      padding-bottom: 0.8rem;
+      border-bottom: 1px solid #e2e8f0;
+      transition: all 0.3s;
+    }
+    
+    .dark-mode .product-card h2 {
+      color: #f1f5f9;
+      border-bottom-color: #475569;
+    }
+    
+    .product-card p {
+      margin-bottom: 0.9rem;
+      color: #64748b;
+      line-height: 1.5;
+      transition: color 0.3s;
+    }
+    
+    .dark-mode .product-card p {
+      color: #94a3b8;
+    }
+    
+    .product-card strong {
+      color: #1e293b;
+      transition: color 0.3s;
+    }
+    
+    .dark-mode .product-card strong {
+      color: #e2e8f0;
+    }
+    
+    .product-price {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #2E8B57;
+      margin: 0.5rem 0;
+      transition: color 0.3s;
+    }
+    
+    .dark-mode .product-price {
+      color: #3cb371;
+    }
+    
+    .product-category {
+      display: inline-block;
+      padding: 0.3rem 0.8rem;
+      background-color: #e2e8f0;
+      color: #475569;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 0.8rem;
+      transition: all 0.3s;
+    }
+    
+    .dark-mode .product-category {
+      background-color: #475569;
+      color: #cbd5e1;
+    }
+    
+    .image-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin: 1.2rem 0;
+    }
+    
+    .image-container img {
+      width: 100%;
+      max-width: 120px;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 10px;
+      border: 2px solid #e2e8f0;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+    
+    .image-container img:hover {
+      transform: scale(1.05);
+      border-color: #2E8B57;
+    }
+    
+    .dark-mode .image-container img {
+      border-color: #475569;
+    }
+    
+    .dark-mode .image-container img:hover {
+      border-color: #3cb371;
+    }
+    
+    .buy-form {
+      margin-top: auto;
+      padding-top: 1.2rem;
+      border-top: 1px solid #e2e8f0;
+      text-align: right;
+      transition: border-color 0.3s;
+    }
+    
+    .dark-mode .buy-form {
+      border-top-color: #475569;
+    }
+    
+    .buy-btn {
+      padding: 0.6rem 1.2rem;
+      background: linear-gradient(135deg, #2E8B57 0%, #3cb371 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 3px 6px rgba(46, 139, 87, 0.2);
+    }
+    
+    .buy-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 10px rgba(46, 139, 87, 0.3);
+    }
+    
+    .owner-note {
+      padding: 0.8rem;
+      background-color: #f1f5f9;
+      border-radius: 8px;
+      text-align: center;
+      font-style: italic;
+      color: #64748b;
+      margin-top: 1rem;
+      transition: all 0.3s;
+    }
+    
+    .dark-mode .owner-note {
+      background-color: #475569;
+      color: #94a3b8;
+    }
+    
+    .no-products {
+      text-align: center;
+      padding: 4rem 2rem;
+      background-color: #f1f5f9;
+      border-radius: 16px;
+      border: 2px dashed #cbd5e1;
+      transition: all 0.3s;
+      grid-column: 1 / -1;
+    }
+    
+    .dark-mode .no-products {
+      background-color: #475569;
+      border-color: #64748b;
+    }
+    
+    .no-products p {
+      margin-bottom: 1.5rem;
+      color: #64748b;
+      font-size: 1.2rem;
+      transition: color 0.3s;
+    }
+    
+    .dark-mode .no-products p {
+      color: #94a3b8;
+    }
+    
+    .flash-success, .flash-error {
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+      text-align: center;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+    
+    .flash-success {
+      background-color: #f0fdf4;
+      color: #15803d;
+      border: 1px solid #bbf7d0;
+    }
+    
+    .dark-mode .flash-success {
+      background-color: #052e16;
+      color: #4ade80;
+      border-color: #14532d;
+    }
+    
+    .flash-error {
+      background-color: #fef2f2;
+      color: #b91c1c;
+      border: 1px solid #fecaca;
+    }
+    
+    .dark-mode .flash-error {
+      background-color: #450a0a;
+      color: #f87171;
+      border-color: #7f1d1d;
+    }
+    
+    .theme-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s;
+      z-index: 100;
+    }
+    
+    .theme-toggle:hover {
+      transform: rotate(15deg);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    }
+    
+    .dark-mode .theme-toggle {
+      background: linear-gradient(135deg, #475569 0%, #374151 100%);
+    }
+    
+    .theme-toggle i {
+      font-size: 1.3rem;
+      color: #4b5563;
+      transition: color 0.3s;
+    }
+    
+    .dark-mode .theme-toggle i {
+      color: #e2e8f0;
+    }
+    
+    @media (max-width: 1000px) {
+      .products-grid {
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      }
+    }
+    
+    @media (max-width: 768px) {
+      body {
+        padding: 1rem;
+      }
+      
+      .products-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .header {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+      }
+      
+      .nav {
+        flex-direction: column;
+        align-items: center;
+        gap: 0.8rem;
+      }
+      
+      h1 {
+        font-size: 1.8rem;
+      }
+    }
+    
+    /* Custom scrollbar for the entire page */
+    ::-webkit-scrollbar {
+      width: 10px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 10px;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: #2E8B57;
+      border-radius: 10px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: #1F6B48;
+    }
+    
+    .dark-mode ::-webkit-scrollbar-track {
+      background: #475569;
+    }
+    
+    .dark-mode ::-webkit-scrollbar-thumb {
+      background: #3cb371;
+    }
+    
+    .dark-mode ::-webkit-scrollbar-thumb:hover {
+      background: #2E8B57;
+    }
   </style>
 </head>
 <body>
-  <nav class="nav">
-    <a href="{{ url_for('dashboard') }}">Dashboard</a>
-    <a href="{{ url_for('my_products') }}">My Products</a>
-    <a href="{{ url_for('add_product') }}">Add New Product</a>
-    <a href="{{ url_for('all_products') }}">All Products</a>
-    <a href="{{ url_for('logout') }}">Logout</a>
-  </nav>
-
-  <h1>Available Products</h1>
-
-  {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-      {% for category, msg in messages %}
-        <p class="flash-{{ category }}">{{ msg }}</p>
-      {% endfor %}
-    {% endif %}
-  {% endwith %}
-
-  {% if products %}
-    {% for product in products %}
-      <div class="product-card">
-        <h2>{{ product.title }}</h2>
-        <p><strong>Category:</strong> {{ product.category or '—' }}</p>
-        <p><strong>Price:</strong> ₹{{ product.price }}</p>
-        <p><strong>Description:</strong> {{ product.description or 'N/A' }}</p>
-        <p><strong>Seller:</strong> {{ product.seller_name }} ({{ product.seller_email }})</p>
-        <div>
-          {% for img in product.images %}
-            <img src="{{ url_for('static', filename=img) }}" alt="Product image">
-          {% endfor %}
-        </div>
-
-        {% if product.user_id != session.user_id %}
-          <form method="POST" action="{{ url_for('buy_product', product_id=product.id) }}">
-            <button type="submit">Buy</button>
-          </form>
-        {% else %}
-          <p><em>You added this product.</em></p>
-        {% endif %}
+  <button class="theme-toggle" id="theme-toggle">
+    <i class="fas fa-moon"></i>
+  </button>
+  
+  <div class="container">
+    <div class="header">
+      <div class="logo">
+        <i class="fas fa-leaf logo-icon"></i>
+        <div class="logo-text">EcoFinds</div>
       </div>
-    {% endfor %}
-  {% else %}
-    <p>No products available at this time.</p>
-  {% endif %}
+    </div>
+    
+    <nav class="nav">
+      <a href="{{ url_for('dashboard') }}"><i class="fas fa-th-large"></i> Dashboard</a>
+      <a href="{{ url_for('my_products') }}"><i class="fas fa-box"></i> My Products</a>
+      <a href="{{ url_for('add_product') }}"><i class="fas fa-plus-circle"></i> Add New Product</a>
+      <a href="{{ url_for('all_products') }}"><i class="fas fa-store"></i> All Products</a>
+      <a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </nav>
+
+    <h1>Available Products</h1>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, msg in messages %}
+          <p class="flash-{{ category }}">{{ msg }}</p>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <div class="products-grid">
+      {% if products %}
+        {% for product in products %}
+          <div class="product-card">
+            <span class="product-category">{{ product.category or 'General' }}</span>
+            <h2>{{ product.title }}</h2>
+            <div class="product-price">₹{{ product.price }}</div>
+            <p><strong>Description:</strong> {{ product.description or 'N/A' }}</p>
+            <p><strong>Seller:</strong> {{ product.seller_name }} ({{ product.seller_email }})</p>
+            
+            <div class="image-container">
+              {% for img in product.images %}
+                <img src="{{ url_for('static', filename=img) }}" alt="Product image">
+              {% endfor %}
+            </div>
+
+            {% if product.user_id != session.user_id %}
+              <form class="buy-form" method="POST" action="{{ url_for('buy_product', product_id=product.id) }}">
+                <button type="submit" class="buy-btn"><i class="fas fa-shopping-cart"></i> Buy Now</button>
+              </form>
+            {% else %}
+              <div class="owner-note">
+                <p><i class="fas fa-info-circle"></i> You added this product</p>
+              </div>
+            {% endif %}
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="no-products">
+          <p>No products available at this time.</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <script>
+    // Theme toggle functionality
+    const themeToggle = document.getElementById('theme-toggle');
+    const themeIcon = themeToggle.querySelector('i');
+    
+    // Check for saved theme preference or respect OS preference
+    const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    const currentTheme = localStorage.getItem('theme');
+    
+    if (currentTheme === 'dark' || (!currentTheme && prefersDarkScheme.matches)) {
+      document.body.classList.add('dark-mode');
+      themeIcon.classList.remove('fa-moon');
+      themeIcon.classList.add('fa-sun');
+    }
+    
+    themeToggle.addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+      
+      if (document.body.classList.contains('dark-mode')) {
+        localStorage.setItem('theme', 'dark');
+        themeIcon.classList.remove('fa-moon');
+        themeIcon.classList.add('fa-sun');
+      } else {
+        localStorage.setItem('theme', 'light');
+        themeIcon.classList.remove('fa-sun');
+        themeIcon.classList.add('fa-moon');
+      }
+    });
+  </script>
 </body>
 </html>
