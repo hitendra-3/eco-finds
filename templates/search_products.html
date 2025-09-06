@@ -1,0 +1,74 @@
+<!-- templates/search_products.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Search Products</title>
+  <style>
+    .product {
+      border: 1px solid #ccc;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+    .images img {
+      max-width: 120px;
+      margin-right: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>Search Products</h1>
+
+  <form id="search-form">
+    <input type="text" id="search-query" placeholder="Search by title or category" required />
+    <button type="submit">Search</button>
+  </form>
+
+  <div id="results"></div>
+
+  <p><a href="{{ url_for('dashboard') }}">Back to Dashboard</a></p>
+
+  <script>
+    const form = document.getElementById('search-form');
+    const resultsDiv = document.getElementById('results');
+
+    form.onsubmit = async (e) => {
+      e.preventDefault();
+      resultsDiv.innerHTML = 'Loading...';
+      const q = document.getElementById('search-query').value.trim();
+      if (!q) return;
+
+      const res = await fetch(`/search-products?q=${encodeURIComponent(q)}`);
+      if (res.ok) {
+        const products = await res.json();
+        if (products.length === 0) {
+          resultsDiv.innerHTML = '<p>No products found.</p>';
+          return;
+        }
+        resultsDiv.innerHTML = '';
+        products.forEach(product => {
+          const div = document.createElement('div');
+          div.classList.add('product');
+
+          let imagesHtml = '';
+          product.images.forEach(img => {
+            imagesHtml += `<img src="/static/${img.image_path}" alt="product image" />`;
+          });
+
+          div.innerHTML = `
+            <h2>${product.title}</h2>
+            <p><strong>Category:</strong> ${product.category || 'N/A'}</p>
+            <p><strong>Price:</strong> $${product.price.toFixed(2)}</p>
+            <p><strong>Description:</strong> ${product.description || 'No description'}</p>
+            <p><strong>Contact:</strong> ${product.contact}</p>
+            <div class="images">${imagesHtml}</div>
+          `;
+          resultsDiv.appendChild(div);
+        });
+      } else {
+        resultsDiv.innerHTML = '<p>Search failed.</p>';
+      }
+    }
+  </script>
+</body>
+</html>

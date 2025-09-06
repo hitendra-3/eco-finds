@@ -1,17 +1,26 @@
 import os
 import secrets
 from datetime import datetime, timedelta
-from flask import Flask, request, jsonify, session, render_template, redirect, url_for
+from flask import Flask, request, jsonify, session, render_template, redirect, url_for, flash
 import mysql.connector
 import bcrypt
 import smtplib
 from email.message import EmailMessage
 from dotenv import load_dotenv
+from werkzeug.utils import secure_filename
 
 load_dotenv()
 
+# Allowed image extensions
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+UPLOAD_FOLDER = os.path.join(os.getcwd(), 'static', 'uploads')
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+# Initialize Flask app FIRST
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET", secrets.token_hex(16))
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # ---------- DB CONFIG ----------
 DB_CONFIG = {
@@ -71,6 +80,9 @@ def store_otp(user_id, otp, ttl=10):
         cur.close()
         conn.close()
 
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 # ---------- ROUTES ----------
 
 @app.route("/")
@@ -79,29 +91,29 @@ def index():
 
 @app.route("/register-page")
 def register_page():
-    return render_template("register.html")  # create this template
+    return render_template("register.html")
 
 @app.route("/login-page")
 def login_page():
-    return render_template("login.html")  # create this template
+    return render_template("login.html")
 
 @app.route("/verify-page")
 def verify_page():
-    return render_template("verify_otp.html")  # create this template
+    return render_template("verify_otp.html")
 
 @app.route("/verify-forgot-page")
 def verify_forgot_page():
-    return render_template("verify_forgot_otp.html")  # create this template
+    return render_template("verify_forgot_otp.html")
 
 @app.route("/reset-password-page")
 def reset_password_page():
-    return render_template("reset_password.html")  # create this template
+    return render_template("reset_password.html")
 
 @app.route("/dashboard")
 def dashboard():
     if "user_id" not in session:
         return redirect(url_for("login_page"))
-    return render_template("dashboard.html")  # create this template
+    return render_template("dashboard.html")
 
 @app.route("/logout")
 def logout():
@@ -144,7 +156,7 @@ def register():
         conn.close()
 
         otp = generate_otp()
-        print(f"Generated OTP (for testing): {otp}")  # Console print
+        print(f"Generated OTP (for testing): {otp}")
 
         send_email_otp(email, otp)
         store_otp(user_id, otp)
@@ -246,7 +258,7 @@ def forgot_password():
 
         user_id = user["id"]
         otp = generate_otp()
-        print(f"[Forgot Password] OTP: {otp}")  # Debug/testing only
+        print(f"[Forgot Password] OTP: {otp}")
 
         send_email_otp(email, otp)
 
@@ -344,6 +356,218 @@ def reset_password():
         print("Reset Password Error:", e)
         return jsonify({"error": "Internal server error"}), 500
 
+# --------- Product Add / Edit / Delete Routes ---------
+
+@app.route("/add-product", methods=["GET"])
+def add_product_page():
+    if "user_id" not in session:
+        return redirect(url_for("login_page"))
+    return render_template("add_product.html")
+
+@app.route("/add-product", methods=["POST"])
+def add_product():
+    if "user_id" not in session:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    user_id = session["user_id"]
+    title = request.form.get("title")
+    description = request.form.get("description")
+    category = request.form.get("category")
+    price = request.form.get("price")
+    contact = request.form.get("contact")
+
+    if not all([title, price, contact]):
+        return jsonify({"error": "Title, price, and contact are required"}), 400
+
+    try:
+        price = float(price)
+    except ValueError:
+        return jsonify({"error": "Invalid price format"}), 400
+
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    cur.execute("""
+        INSERT INTO products (user_id, title, description, category, price, contact)
+        VALUES (%s, %s, %s, %s, %s, %s)
+    """, (user_id, title, description, category, price, contact))
+    conn.commit()
+    product_id = cur.lastrowid
+
+    # Save images
+    files = request.files.getlist("images")
+    for file in files:
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            # To avoid overwriting files, prepend unique token
+            unique_prefix = secrets.token_hex(8)
+            filename = f"{unique_prefix}_{filename}"
+            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            file.save(filepath)
+
+            relative_path = f"uploads/{filename}"
+            cur.execute(
+                "INSERT INTO product_images (product_id, image_path) VALUES (%s, %s)",
+                (product_id, relative_path)
+            )
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    return redirect(url_for("dashboard"))
+
+@app.route("/my-products")
+def my_products():
+    if "user_id" not in session:
+        return redirect(url_for("login_page"))
+
+    user_id = session["user_id"]
+    conn = get_db_connection()
+    cur = conn.cursor(dictionary=True)
+
+    cur.execute("""
+        SELECT * FROM products WHERE user_id = %s ORDER BY created_at DESC
+    """, (user_id,))
+    products = cur.fetchall()
+
+    # Fetch images for each product
+    for product in products:
+        cur.execute("SELECT image_path FROM product_images WHERE product_id = %s", (product["id"],))
+        images = cur.fetchall()
+        product["images"] = images
+
+    cur.close()
+    conn.close()
+
+    return render_template("my_products.html", products=products)
+
+@app.route("/edit-product/<int:product_id>", methods=["GET"])
+def edit_product_page(product_id):
+    if "user_id" not in session:
+        return redirect(url_for("login_page"))
+
+    user_id = session["user_id"]
+    conn = get_db_connection()
+    cur = conn.cursor(dictionary=True)
+
+    cur.execute("SELECT * FROM products WHERE id = %s AND user_id = %s", (product_id, user_id))
+    product = cur.fetchone()
+
+    if not product:
+        cur.close()
+        conn.close()
+        return "Product not found or unauthorized", 404
+
+    cur.execute("SELECT id, image_path FROM product_images WHERE product_id = %s", (product_id,))
+    images = cur.fetchall()
+
+    cur.close()
+    conn.close()
+
+    return render_template("edit_product.html", product=product, images=images)
+
+@app.route("/edit-product/<int:product_id>", methods=["POST"])
+def edit_product(product_id):
+    if "user_id" not in session:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    user_id = session["user_id"]
+    title = request.form.get("title")
+    description = request.form.get("description")
+    category = request.form.get("category")
+    price = request.form.get("price")
+    contact = request.form.get("contact")
+
+    if not all([title, price, contact]):
+        flash("Title, price, and contact are required", "error")
+        return redirect(url_for("edit_product_page", product_id=product_id))
+
+    try:
+        price = float(price)
+    except ValueError:
+        flash("Invalid price format", "error")
+        return redirect(url_for("edit_product_page", product_id=product_id))
+
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    # Check ownership
+    cur.execute("SELECT id FROM products WHERE id=%s AND user_id=%s", (product_id, user_id))
+    if not cur.fetchone():
+        cur.close()
+        conn.close()
+        return jsonify({"error": "Product not found or unauthorized"}), 404
+
+    # Update product info
+    cur.execute("""
+        UPDATE products
+        SET title=%s, description=%s, category=%s, price=%s, contact=%s
+        WHERE id=%s
+    """, (title, description, category, price, contact, product_id))
+    conn.commit()
+
+    # Save new images if any
+    files = request.files.getlist("images")
+    for file in files:
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            unique_prefix = secrets.token_hex(8)
+            filename = f"{unique_prefix}_{filename}"
+            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            file.save(filepath)
+
+            relative_path = f"uploads/{filename}"
+            cur.execute(
+                "INSERT INTO product_images (product_id, image_path) VALUES (%s, %s)",
+                (product_id, relative_path)
+            )
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    flash("Product updated successfully", "success")
+    return redirect(url_for("my_products"))
+
+@app.route("/delete-product/<int:product_id>", methods=["POST"])
+def delete_product(product_id):
+    if "user_id" not in session:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    user_id = session["user_id"]
+
+    conn = get_db_connection()
+    cur = conn.cursor(dictionary=True)
+
+    # Verify ownership
+    cur.execute("SELECT * FROM products WHERE id = %s AND user_id = %s", (product_id, user_id))
+    product = cur.fetchone()
+    if not product:
+        cur.close()
+        conn.close()
+        return jsonify({"error": "Product not found or unauthorized"}), 404
+
+    # Get images for product to delete files
+    cur.execute("SELECT image_path FROM product_images WHERE product_id = %s", (product_id,))
+    images = cur.fetchall()
+
+    # Delete images from filesystem
+    for img in images:
+        image_full_path = os.path.join(app.static_folder, img["image_path"])
+        if os.path.exists(image_full_path):
+            os.remove(image_full_path)
+
+    # Delete product images records
+    cur.execute("DELETE FROM product_images WHERE product_id = %s", (product_id,))
+
+    # Delete product record
+    cur.execute("DELETE FROM products WHERE id = %s", (product_id,))
+
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    flash("Product deleted successfully", "success")
+    return redirect(url_for("my_products"))
 
 # ---------- RUN ----------
 if __name__ == "__main__":

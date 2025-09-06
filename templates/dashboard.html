@@ -1,12 +1,20 @@
-<!-- templates/dashboard.html -->
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Dashboard</title>
+    <meta charset="UTF-8" />
+    <title>Dashboard</title>
 </head>
 <body>
-  <h1>Welcome to Your Dashboard</h1>
-  <p>This is a placeholder dashboard. You can build features here.</p>
-  <a href="/logout">Logout</a>
+    <h1>Welcome to Your Dashboard</h1>
+
+    <!-- Add navigation buttons -->
+    <nav>
+        <a href="{{ url_for('my_products') }}">My Products</a> |
+        <a href="{{ url_for('add_product_page') }}">Add New Product</a> |
+        <a href="{{ url_for('logout') }}">Logout</a>
+    </nav>
+
+    <!-- Your existing dashboard content here -->
+
 </body>
 </html>

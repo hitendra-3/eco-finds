@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>My Products</title>
+    <style>
+        .product {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+        .product img {
+            max-width: 150px;
+            max-height: 150px;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>My Products</h1>
+
+    <a href="{{ url_for('add_product_page') }}">Add New Product</a> | 
+    <a href="{{ url_for('dashboard') }}">Dashboard</a>
+
+    {% if products %}
+        {% for product in products %}
+        <div class="product">
+            <h3>{{ product.title }}</h3>
+            <p><strong>Category:</strong> {{ product.category or 'N/A' }}</p>
+            <p><strong>Description:</strong> {{ product.description or 'No description' }}</p>
+            <p><strong>Price:</strong> ${{ "%.2f"|format(product.price) }}</p>
+            <p><strong>Contact:</strong> {{ product.contact }}</p>
+            <div>
+                {% for img in product.images %}
+                    <img src="{{ url_for('static', filename=img.image_path) }}" alt="Product Image" />
+                {% endfor %}
+            </div>
+            <form action="{{ url_for('delete_product', product_id=product.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this product?');">
+                <button type="submit">Delete</button>
+            </form>
+        </div>
+        {% endfor %}
+    {% else %}
+        <p>No products found. <a href="{{ url_for('add_product_page') }}">Add one now</a>.</p>
+    {% endif %}
+</body>
+</html>

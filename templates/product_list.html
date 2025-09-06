@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Your Products</title>
+</head>
+<body>
+  <h1>My Products</h1>
+  {% if products %}
+    <ul>
+      {% for product in products %}
+        <li>
+          <h3>{{ product.title }}</h3>
+          <p>{{ product.description }}</p>
+          <p>Category: {{ product.category }}, Price: ₹{{ product.price }}</p>
+          <em>Contact: {{ product.contact }}</em>
+          <div>
+            {% for img in product.images %}
+              <img src="{{ url_for('static', filename=img.image_path) }}" alt="Product Image" width="150">
+            {% endfor %}
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No products added yet.</p>
+  {% endif %}
+  <p><a href="{{ url_for('dashboard') }}">Back to Dashboard</a></p>
+</body>
+</html>
