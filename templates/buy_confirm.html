@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Confirm Purchase</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    .box { border: 1px solid #ccc; padding: 20px; border-radius: 8px; width: 400px; margin: auto; }
+    button { padding: 10px 20px; margin: 10px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h2>Confirm Purchase</h2>
+    <p>Are you sure you want to buy <b>{{ product.title }}</b> for ₹{{ product.price }}?</p>
+
+    <form method="POST">
+      <button type="submit" name="payment_type" value="UPI">Pay with UPI</button>
+      <button type="submit" name="payment_type" value="Card">Pay with Credit Card</button>
+    </form>
+  </div>
+</body>
+</html>

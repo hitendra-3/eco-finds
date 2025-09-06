@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Verify Card PIN</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    .box { border: 1px solid #ccc; padding: 20px; border-radius: 8px; width: 400px; margin: auto; text-align: center; }
+    input { padding: 10px; width: 60%; margin: 10px 0; }
+    button { padding: 10px 20px; margin-top: 10px; cursor: pointer; }
+    .hint { color: gray; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h2>Verify Card Payment</h2>
+    <p>Product: <b>{{ product.title }}</b></p>
+    <p>Total Amount: ₹{{ product.price }}</p>
+    <p class="hint">Enter 4-digit Card PIN (Hint: <code>1232</code>)</p>
+
+    <form method="POST" action="{{ url_for('finalize_payment', product_id=product.id) }}">
+      <input type="hidden" name="payment_type" value="Card">
+      <input type="password" name="pin" maxlength="4" pattern="[0-9]{4}" placeholder="••••" required>
+      <br>
+      <button type="submit">Confirm Payment</button>
+    </form>
+  </div>
+</body>
+</html>

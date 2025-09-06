@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Payment Success</title>
+  <style>
+    body { text-align: center; padding: 50px; font-family: Arial, sans-serif; }
+    .success-icon {
+      font-size: 100px;
+      color: green;
+    }
+    .details {
+      margin-top: 20px;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+  <div class="success-icon">✔</div>
+  <h1>Payment Successful!</h1>
+  <div class="details">
+    <p>Order ID: <strong>{{ order_id }}</strong></p>
+    <p>Product: {{ product.title }}</p>
+    <p>Price: ₹{{ product.price }}</p>
+    <p>Payment Method: {{ payment_type }}</p>
+  </div>
+  <p>Thank you for booking with EcoFinds!</p>
+  <a href="{{ url_for('all_products') }}">Back to Products</a>
+</body>
+</html>

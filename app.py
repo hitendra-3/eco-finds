@@ -611,10 +611,11 @@ def all_products():
         conn.close()
 
 @app.route("/buy-product/<int:product_id>", methods=["POST"])
-def buy_product(product_id):
+def buy(product_id):
     if "user_id" not in session:
         flash("You must be logged in to express interest.", "error")
         return redirect(url_for("login_page"))
+    
 
     buyer_id = session["user_id"]
 
@@ -700,6 +701,260 @@ def send_email_otp(to_email, message, subject_override=None):
     except Exception as e:
         print("Email send failure:", e)
 
+# ---------------- ADD TO CART ----------------
+@app.route("/add-to-cart/<int:product_id>", methods=["POST"])
+def add_to_cart(product_id):
+    if "user_id" not in session:
+        flash("Please log in to add to cart.", "error")
+        return redirect(url_for("login_page"))
+
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("INSERT INTO cart_items (user_id, product_id) VALUES (%s, %s)",
+                (session["user_id"], product_id))
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    flash("Product added to cart!", "success")
+    return redirect(url_for("all_products"))
+
+
+# ---------------- VIEW CART ----------------
+@app.route("/cart")
+def view_cart():
+    if "user_id" not in session:
+        return redirect(url_for("login_page"))
+
+    conn = get_db_connection()
+    cur = conn.cursor(dictionary=True)
+    cur.execute("""
+        SELECT c.id AS cart_id, p.id AS product_id, p.title, p.price, u.name AS seller_name, u.email AS seller_email
+        FROM cart_items c
+        JOIN products p ON c.product_id = p.id
+        JOIN users u ON p.user_id = u.id
+        WHERE c.user_id = %s
+    """, (session["user_id"],))
+    cart_items = cur.fetchall()
+    cur.close()
+    conn.close()
+
+    return render_template("cart.html", cart_items=cart_items)
+
+
+# ---------------- STEP 1: Confirm Buy ----------------
+@app.route("/buy/<int:product_id>", methods=["GET", "POST"])
+def buy_product(product_id):
+    if "user_id" not in session:
+        return redirect(url_for("login_page"))
+
+    conn = get_db_connection()
+    cur = conn.cursor(dictionary=True)
+    cur.execute("""
+        SELECT p.id, p.title, p.price, u.name AS seller_name, u.email AS seller_email
+        FROM products p
+        JOIN users u ON p.user_id = u.id
+        WHERE p.id = %s
+    """, (product_id,))
+    product = cur.fetchone()
+    cur.close()
+    conn.close()
+
+    if not product:
+        flash("Product not found.", "error")
+        return redirect(url_for("view_cart"))
+
+    if request.method == "POST":
+        payment_type = request.form.get("payment_type")
+        if payment_type == "UPI":
+            return redirect(url_for("upi_payment", product_id=product_id))
+        elif payment_type == "Card":
+            return redirect(url_for("card_payment", product_id=product_id))
+
+    return render_template("buy_confirm.html", product=product)
+
+
+# ---------------- STEP 2A: UPI Payment ----------------
+@app.route("/upi-payment/<int:product_id>", methods=["GET", "POST"])
+def upi_payment(product_id):
+    if "user_id" not in session:
+        return redirect(url_for("login_page"))
+
+    conn = get_db_connection()
+    cur = conn.cursor(dictionary=True)
+    cur.execute("SELECT id, title, price FROM products WHERE id=%s", (product_id,))
+    product = cur.fetchone()
+    cur.close()
+    conn.close()
+
+    if request.method == "POST":
+        upi_id = request.form.get("upi_id")
+        return redirect(url_for("verify_upi", product_id=product_id, upi_id=upi_id))
+
+    return render_template("upi_payment.html", product=product)
+
+
+# ---------------- STEP 2B: Card Payment ----------------
+@app.route("/card-payment/<int:product_id>", methods=["GET", "POST"])
+def card_payment(product_id):
+    if "user_id" not in session:
+        return redirect(url_for("login_page"))
+
+    conn = get_db_connection()
+    cur = conn.cursor(dictionary=True)
+    cur.execute("SELECT id, title, price FROM products WHERE id=%s", (product_id,))
+    product = cur.fetchone()
+    cur.close()
+    conn.close()
+
+    if request.method == "POST":
+        card_number = request.form.get("card_number")
+        return redirect(url_for("verify_card", product_id=product_id, card_number=card_number))
+
+    return render_template("card_payment.html", product=product)
+
+
+@app.route("/verify-upi/<int:product_id>", methods=["GET"])
+def verify_upi(product_id):
+    conn = get_db_connection()
+    cur = conn.cursor(dictionary=True)
+    cur.execute("SELECT id, title, price FROM products WHERE id=%s", (product_id,))
+    product = cur.fetchone()
+    cur.close()
+    conn.close()
+    return render_template("verify_upi.html", product=product)
+
+
+@app.route("/verify-card/<int:product_id>", methods=["GET"])
+def verify_card(product_id):
+    conn = get_db_connection()
+    cur = conn.cursor(dictionary=True)
+    cur.execute("SELECT id, title, price FROM products WHERE id=%s", (product_id,))
+    product = cur.fetchone()
+    cur.close()
+    conn.close()
+    return render_template("verify_card.html", product=product)
+
+
+
+
+import traceback
+from datetime import datetime  # keep this import
+
+@app.route("/finalize-payment/<int:product_id>", methods=["POST"])
+def finalize_payment(product_id):
+    if "user_id" not in session:
+        flash("You must be logged in to complete payment.", "error")
+        return redirect(url_for("login_page"))
+
+    buyer_id = session["user_id"]
+    payment_type = request.form.get("payment_type")
+
+    conn = None
+    cur = None
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor(dictionary=True)
+
+        # Fetch product
+        cur.execute("""
+            SELECT p.title, p.price, u.name AS seller_name, u.email AS seller_email
+            FROM products p
+            JOIN users u ON p.user_id = u.id
+            WHERE p.id = %s
+        """, (product_id,))
+        product = cur.fetchone()
+        if not product:
+            flash("Product not found.", "error")
+            return redirect(url_for("all_products"))
+
+        # Fetch buyer
+        cur.execute("SELECT name, email FROM users WHERE id = %s", (buyer_id,))
+        buyer = cur.fetchone()
+        if not buyer:
+            flash("Buyer not found.", "error")
+            return redirect(url_for("all_products"))
+
+        # Generate order ID
+        order_id = f"ORD{product_id}{buyer_id}{int(datetime.now().timestamp())}"
+
+        # --- Send Buyer Email ---
+        buyer_subject = f"[EcoFinds] Order Confirmation - {product['title']}"
+        buyer_body = f"""Hello {buyer['name']},
+
+✅ Your payment is confirmed!
+
+Order ID: {order_id}
+Product: {product['title']}
+Price: ₹{product['price']}
+Payment Method: {payment_type}
+
+Thank you for booking with EcoFinds!
+"""
+        send_email_notification(buyer['email'], buyer_body, subject_override=buyer_subject)
+
+        # --- Send Seller Email ---
+        seller_subject = "[EcoFinds] Your product has been booked!"
+        seller_body = f"""Hello {product['seller_name']},
+
+Your product has been successfully booked by a buyer.
+
+Order ID: {order_id}
+Product: {product['title']}
+Buyer: {buyer['name']} ({buyer['email']})
+
+Please remove this product from your listing.
+
+Thank you for using EcoFinds!
+"""
+        send_email_notification(product['seller_email'], seller_body, subject_override=seller_subject)
+
+        # --- Flash Green Success Message ---
+        flash("✅ Your payment is confirmed!", "success")
+
+        # Show success page
+        return render_template("payment_success.html",
+                               order_id=order_id,
+                               product=product,
+                               payment_type=payment_type)
+
+    except Exception as e:
+        print("❌ Finalize payment error:", e)
+        return redirect(url_for("all_products"))
+    finally:
+        if cur: cur.close()
+        if conn: conn.close()
+
+
+def send_email_notification(to_email, message, subject_override=None):
+    """
+    Generic email sender for normal notifications (order confirmations, etc.)
+    Uses SMTP_* env vars. Safe to call with plain text message.
+    """
+    SMTP_HOST = os.getenv("SMTP_HOST")
+    SMTP_PORT = int(os.getenv("SMTP_PORT", 587))
+    SMTP_USER = os.getenv("SMTP_USER")
+    SMTP_PASS = os.getenv("SMTP_PASS")
+
+    if not (SMTP_HOST and SMTP_USER and SMTP_PASS):
+        print("[EMAIL] SMTP credentials not set; skipping email.")
+        return
+
+    msg = EmailMessage()
+    msg["Subject"] = subject_override or "EcoFinds Notification"
+    msg["From"] = SMTP_USER
+    msg["To"] = to_email
+    msg.set_content(message)
+
+    try:
+        with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as smtp:
+            smtp.starttls()
+            smtp.login(SMTP_USER, SMTP_PASS)
+            smtp.send_message(msg)
+        print(f"[EMAIL] Sent to {to_email} with subject '{msg['Subject']}'")
+    except Exception as e:
+        print("[EMAIL] Send failure:", e)
+ 
 # ---------- RUN ----------
 if __name__ == "__main__":
     app.run(debug=True)

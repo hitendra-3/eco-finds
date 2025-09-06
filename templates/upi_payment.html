@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>UPI Payment</title>
+</head>
+<body>
+  <h1>UPI Payment</h1>
+  <p>Product: {{ product.title }}</p>
+  <p>Amount: ₹{{ product.price }}</p>
+
+  <form method="POST">
+    <label>Enter UPI ID:</label>
+    <input type="text" name="upi_id" required>
+    <button type="submit">Proceed</button>
+  </form>
+</body>
+</html>

@@ -17,6 +17,7 @@
     <a href="{{ url_for('my_products') }}">My Products</a>
     <a href="{{ url_for('add_product') }}">Add New Product</a>
     <a href="{{ url_for('all_products') }}">All Products</a>
+    <a href="{{ url_for('view_cart') }}">Cart</a>
     <a href="{{ url_for('logout') }}">Logout</a>
   </nav>
 
@@ -45,8 +46,19 @@
         </div>
 
         {% if product.user_id != session.user_id %}
-          <form method="POST" action="{{ url_for('buy_product', product_id=product.id) }}">
-            <button type="submit">Buy</button>
+          <!-- Add to Cart -->
+          <form method="POST" action="{{ url_for('add_to_cart', product_id=product.id) }}">
+            <button type="submit">Add to Cart</button>
+          </form>
+
+          <!-- Direct Buy (new payment flow) -->
+          <form method="GET" action="{{ url_for('buy_product', product_id=product.id) }}">
+            <button type="submit">Buy Now</button>
+          </form>
+
+          <!-- Interest (old email flow) -->
+          <form method="POST" action="{{ url_for('buy', product_id=product.id) }}">
+            <button type="submit">Express Interest</button>
           </form>
         {% else %}
           <p><em>You added this product.</em></p>
