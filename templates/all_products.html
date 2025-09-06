@@ -2,12 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-<<<<<<< HEAD
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>All Products - EcoFinds</title>
-=======
-  <title>All Products</title>
->>>>>>> 985ffccee42c7fa8ca53f0b77b14261b499615a9
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     * {
@@ -102,24 +98,12 @@
       color: #f1f5f9;
     }
     
-<<<<<<< HEAD
     .nav-links {
       display: flex;
       gap: 1.5rem;
     }
     
     .nav-link {
-=======
-    .nav {
-      display: flex;
-      justify-content: center;
-      gap: 1.5rem;
-      margin-bottom: 2rem;
-      flex-wrap: wrap;
-    }
-    
-    .nav a {
->>>>>>> 985ffccee42c7fa8ca53f0b77b14261b499615a9
       color: #2E8B57;
       text-decoration: none;
       font-weight: 600;
@@ -130,16 +114,9 @@
       position: relative;
       overflow: hidden;
       z-index: 1;
-<<<<<<< HEAD
     }
     
     .nav-link::before {
-=======
-      margin-right: 0;
-    }
-    
-    .nav a::before {
->>>>>>> 985ffccee42c7fa8ca53f0b77b14261b499615a9
       content: '';
       position: absolute;
       top: 0;
@@ -151,7 +128,6 @@
       z-index: -1;
     }
     
-<<<<<<< HEAD
     .nav-link:hover::before {
       left: 0;
     }
@@ -161,55 +137,27 @@
     }
     
     .dark-mode .nav-link {
-=======
-    .nav a:hover::before {
-      left: 0;
-    }
-    
-    .nav a:hover {
-      color: white;
-    }
-    
-    .dark-mode .nav a {
->>>>>>> 985ffccee42c7fa8ca53f0b77b14261b499615a9
       color: #3cb371;
       border-color: #3cb371;
     }
     
-<<<<<<< HEAD
     .dark-mode .nav-link::before {
       background: #3cb371;
     }
     
     .dark-mode .nav-link:hover {
-=======
-    .dark-mode .nav a::before {
-      background: #3cb371;
-    }
-    
-    .dark-mode .nav a:hover {
->>>>>>> 985ffccee42c7fa8ca53f0b77b14261b499615a9
       color: white;
     }
     
     .products-grid {
       display: grid;
-<<<<<<< HEAD
       grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
-=======
-      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
->>>>>>> 985ffccee42c7fa8ca53f0b77b14261b499615a9
       gap: 2rem;
       padding: 1rem 0;
     }
     
-<<<<<<< HEAD
     .product {
       border: 3px solid;
-=======
-    .product-card {
-      border: 3px solid #2E8B57;
->>>>>>> 985ffccee42c7fa8ca53f0b77b14261b499615a9
       border-radius: 16px;
       padding: 1.8rem;
       background-color: white;
@@ -222,11 +170,7 @@
       overflow: hidden;
     }
     
-<<<<<<< HEAD
     .product::before {
-=======
-    .product-card::before {
->>>>>>> 985ffccee42c7fa8ca53f0b77b14261b499615a9
       content: '';
       position: absolute;
       top: 0;
@@ -236,7 +180,6 @@
       background: linear-gradient(90deg, #2E8B57, #3B82F6, #F59E0B, #8B5CF6);
     }
     
-<<<<<<< HEAD
     /* Different border colors for products */
     .product:nth-child(4n+1) {
       border-color: #2E8B57;
@@ -255,30 +198,10 @@
     }
     
     .product:hover {
-=======
-    .product-card:nth-child(4n+1) {
-      border-color: #2E8B57;
-    }
-    
-    .product-card:nth-child(4n+2) {
-      border-color: #3B82F6;
-    }
-    
-    .product-card:nth-child(4n+3) {
-      border-color: #F59E0B;
-    }
-    
-    .product-card:nth-child(4n+4) {
-      border-color: #8B5CF6;
-    }
-    
-    .product-card:hover {
->>>>>>> 985ffccee42c7fa8ca53f0b77b14261b499615a9
       transform: translateY(-5px);
       box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
     }
     
-<<<<<<< HEAD
     /* Hover effects with different colors */
     .product:nth-child(4n+1):hover {
       box-shadow: 0 12px 20px rgba(46, 139, 87, 0.2);
@@ -297,42 +220,15 @@
     }
     
     .dark-mode .product {
-=======
-    .product-card:nth-child(4n+1):hover {
-      box-shadow: 0 12px 20px rgba(46, 139, 87, 0.2);
-    }
-    
-    .product-card:nth-child(4n+2):hover {
-      box-shadow: 0 12px 20px rgba(59, 130, 246, 0.2);
-    }
-    
-    .product-card:nth-child(4n+3):hover {
-      box-shadow: 0 12px 20px rgba(245, 158, 11, 0.2);
-    }
-    
-    .product-card:nth-child(4n+4):hover {
-      box-shadow: 0 12px 20px rgba(139, 92, 246, 0.2);
-    }
-    
-    .dark-mode .product-card {
->>>>>>> 985ffccee42c7fa8ca53f0b77b14261b499615a9
       background-color: #334155;
       box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
     }
     
-<<<<<<< HEAD
     .dark-mode .product:hover {
       box-shadow: 0 12px 20px rgba(0, 0, 0, 0.25);
     }
     
     .product h3 {
-=======
-    .dark-mode .product-card:hover {
-      box-shadow: 0 12px 20px rgba(0, 0, 0, 0.25);
-    }
-    
-    .product-card h2 {
->>>>>>> 985ffccee42c7fa8ca53f0b77b14261b499615a9
       font-size: 1.5rem;
       color: #1e293b;
       margin-bottom: 1.2rem;
@@ -341,16 +237,11 @@
       transition: all 0.3s;
     }
     
-<<<<<<< HEAD
     .dark-mode .product h3 {
-=======
-    .dark-mode .product-card h2 {
->>>>>>> 985ffccee42c7fa8ca53f0b77b14261b499615a9
       color: #f1f5f9;
       border-bottom-color: #475569;
     }
     
-<<<<<<< HEAD
     .product p {
       margin-bottom: 0.9rem;
       color: #64748b;
@@ -370,25 +261,6 @@
     }
     
     .dark-mode .product strong {
-=======
-    .product-card p {
-      margin-bottom: 0.9rem;
-      color: #64748b;
-      line-height: 1.5;
-      transition: color 0.3s;
-    }
-    
-    .dark-mode .product-card p {
-      color: #94a3b8;
-    }
-    
-    .product-card strong {
-      color: #1e293b;
-      transition: color 0.3s;
-    }
-    
-    .dark-mode .product-card strong {
->>>>>>> 985ffccee42c7fa8ca53f0b77b14261b499615a9
       color: #e2e8f0;
     }
     
@@ -397,10 +269,6 @@
       font-weight: 700;
       color: #2E8B57;
       margin: 0.5rem 0;
-<<<<<<< HEAD
-=======
-      transition: color 0.3s;
->>>>>>> 985ffccee42c7fa8ca53f0b77b14261b499615a9
     }
     
     .dark-mode .product-price {
@@ -416,10 +284,6 @@
       font-size: 0.85rem;
       font-weight: 600;
       margin-bottom: 0.8rem;
-<<<<<<< HEAD
-=======
-      transition: all 0.3s;
->>>>>>> 985ffccee42c7fa8ca53f0b77b14261b499615a9
     }
     
     .dark-mode .product-category {
@@ -427,28 +291,17 @@
       color: #cbd5e1;
     }
     
-<<<<<<< HEAD
     .image-gallery {
-=======
-    .image-container {
->>>>>>> 985ffccee42c7fa8ca53f0b77b14261b499615a9
       display: flex;
       flex-wrap: wrap;
       gap: 1rem;
       margin: 1.2rem 0;
     }
     
-<<<<<<< HEAD
     .image-gallery img {
       width: 100%;
       max-width: 140px;
       height: 140px;
-=======
-    .image-container img {
-      width: 100%;
-      max-width: 120px;
-      height: 120px;
->>>>>>> 985ffccee42c7fa8ca53f0b77b14261b499615a9
       object-fit: cover;
       border-radius: 10px;
       border: 2px solid #e2e8f0;
@@ -456,16 +309,11 @@
       cursor: pointer;
     }
     
-<<<<<<< HEAD
     .image-gallery img:hover {
-=======
-    .image-container img:hover {
->>>>>>> 985ffccee42c7fa8ca53f0b77b14261b499615a9
       transform: scale(1.05);
       border-color: #2E8B57;
     }
     
-<<<<<<< HEAD
     .dark-mode .image-gallery img {
       border-color: #475569;
     }
@@ -582,64 +430,13 @@
       padding: 1rem;
       background-color: #f8fafc;
       border-radius: 8px;
-=======
-    .dark-mode .image-container img {
-      border-color: #475569;
-    }
-    
-    .dark-mode .image-container img:hover {
-      border-color: #3cb371;
-    }
-    
-    .buy-form {
-      margin-top: auto;
-      padding-top: 1.2rem;
-      border-top: 1px solid #e2e8f0;
-      text-align: right;
-      transition: border-color 0.3s;
-    }
-    
-    .dark-mode .buy-form {
-      border-top-color: #475569;
-    }
-    
-    .buy-btn {
-      padding: 0.6rem 1.2rem;
-      background: linear-gradient(135deg, #2E8B57 0%, #3cb371 100%);
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s;
-      box-shadow: 0 3px 6px rgba(46, 139, 87, 0.2);
-    }
-    
-    .buy-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 5px 10px rgba(46, 139, 87, 0.3);
-    }
-    
-    .owner-note {
-      padding: 0.8rem;
-      background-color: #f1f5f9;
-      border-radius: 8px;
-      text-align: center;
-      font-style: italic;
-      color: #64748b;
->>>>>>> 985ffccee42c7fa8ca53f0b77b14261b499615a9
       margin-top: 1rem;
       transition: all 0.3s;
     }
     
     .dark-mode .owner-note {
-<<<<<<< HEAD
       color: #94a3b8;
       background-color: #475569;
-=======
-      background-color: #475569;
-      color: #94a3b8;
->>>>>>> 985ffccee42c7fa8ca53f0b77b14261b499615a9
     }
     
     .no-products {
@@ -668,7 +465,6 @@
       color: #94a3b8;
     }
     
-<<<<<<< HEAD
     .no-products a {
       color: #2E8B57;
       text-decoration: none;
@@ -693,39 +489,6 @@
     .dark-mode .no-products a:hover {
       background-color: #3cb371;
       color: white;
-=======
-    .flash-success, .flash-error {
-      padding: 1rem;
-      border-radius: 8px;
-      margin-bottom: 1.5rem;
-      text-align: center;
-      font-weight: 600;
-      transition: all 0.3s;
-    }
-    
-    .flash-success {
-      background-color: #f0fdf4;
-      color: #15803d;
-      border: 1px solid #bbf7d0;
-    }
-    
-    .dark-mode .flash-success {
-      background-color: #052e16;
-      color: #4ade80;
-      border-color: #14532d;
-    }
-    
-    .flash-error {
-      background-color: #fef2f2;
-      color: #b91c1c;
-      border: 1px solid #fecaca;
-    }
-    
-    .dark-mode .flash-error {
-      background-color: #450a0a;
-      color: #f87171;
-      border-color: #7f1d1d;
->>>>>>> 985ffccee42c7fa8ca53f0b77b14261b499615a9
     }
     
     .theme-toggle {
@@ -766,7 +529,6 @@
       color: #e2e8f0;
     }
     
-<<<<<<< HEAD
     /* Flash messages */
     .flash-messages {
       max-width: 800px;
@@ -810,11 +572,6 @@
     @media (max-width: 1000px) {
       .products-grid {
         grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-=======
-    @media (max-width: 1000px) {
-      .products-grid {
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
->>>>>>> 985ffccee42c7fa8ca53f0b77b14261b499615a9
       }
     }
     
@@ -833,28 +590,18 @@
         text-align: center;
       }
       
-<<<<<<< HEAD
       .nav-links {
         justify-content: center;
         flex-wrap: wrap;
-=======
-      .nav {
-        flex-direction: column;
-        align-items: center;
-        gap: 0.8rem;
->>>>>>> 985ffccee42c7fa8ca53f0b77b14261b499615a9
       }
       
       h1 {
         font-size: 1.8rem;
       }
-<<<<<<< HEAD
       
       .product {
         padding: 1.2rem;
       }
-=======
->>>>>>> 985ffccee42c7fa8ca53f0b77b14261b499615a9
     }
     
     /* Custom scrollbar for the entire page */
@@ -900,7 +647,6 @@
         <i class="fas fa-leaf logo-icon"></i>
         <div class="logo-text">EcoFinds</div>
       </div>
-<<<<<<< HEAD
       
       <div class="nav-links">
         <a href="{{ url_for('dashboard') }}" class="nav-link"><i class="fas fa-home"></i> Dashboard</a>
@@ -986,56 +732,10 @@
             {% else %}
               <div class="owner-note">
                 <i class="fas fa-info-circle"></i> You added this product
-=======
-    </div>
-    
-    <nav class="nav">
-      <a href="{{ url_for('dashboard') }}"><i class="fas fa-th-large"></i> Dashboard</a>
-      <a href="{{ url_for('my_products') }}"><i class="fas fa-box"></i> My Products</a>
-      <a href="{{ url_for('add_product') }}"><i class="fas fa-plus-circle"></i> Add New Product</a>
-      <a href="{{ url_for('all_products') }}"><i class="fas fa-store"></i> All Products</a>
-      <a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a>
-    </nav>
-
-    <h1>Available Products</h1>
-
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for category, msg in messages %}
-          <p class="flash-{{ category }}">{{ msg }}</p>
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
-
-    <div class="products-grid">
-      {% if products %}
-        {% for product in products %}
-          <div class="product-card">
-            <span class="product-category">{{ product.category or 'General' }}</span>
-            <h2>{{ product.title }}</h2>
-            <div class="product-price">₹{{ product.price }}</div>
-            <p><strong>Description:</strong> {{ product.description or 'N/A' }}</p>
-            <p><strong>Seller:</strong> {{ product.seller_name }} ({{ product.seller_email }})</p>
-            
-            <div class="image-container">
-              {% for img in product.images %}
-                <img src="{{ url_for('static', filename=img) }}" alt="Product image">
-              {% endfor %}
-            </div>
-
-            {% if product.user_id != session.user_id %}
-              <form class="buy-form" method="POST" action="{{ url_for('buy_product', product_id=product.id) }}">
-                <button type="submit" class="buy-btn"><i class="fas fa-shopping-cart"></i> Buy Now</button>
-              </form>
-            {% else %}
-              <div class="owner-note">
-                <p><i class="fas fa-info-circle"></i> You added this product</p>
->>>>>>> 985ffccee42c7fa8ca53f0b77b14261b499615a9
               </div>
             {% endif %}
           </div>
         {% endfor %}
-<<<<<<< HEAD
       </div>
     {% else %}
       <div class="no-products">
@@ -1043,14 +743,6 @@
         <p>No products available at this time.</p>
       </div>
     {% endif %}
-=======
-      {% else %}
-        <div class="no-products">
-          <p>No products available at this time.</p>
-        </div>
-      {% endif %}
-    </div>
->>>>>>> 985ffccee42c7fa8ca53f0b77b14261b499615a9
   </div>
 
   <script>
