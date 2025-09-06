@@ -108,12 +108,77 @@ def verify_forgot_page():
 @app.route("/reset-password-page")
 def reset_password_page():
     return render_template("reset_password.html")
-
-@app.route("/dashboard")
+# ---------------- DASHBOARD ROUTE ----------------
+@app.route("/dashboard", methods=["GET"])
 def dashboard():
     if "user_id" not in session:
+        flash("You must be logged in to access the dashboard.", "error")
         return redirect(url_for("login_page"))
-    return render_template("dashboard.html")
+
+    category = request.args.get("category", "")
+    name = request.args.get("name", "")
+
+    conn = get_db_connection()
+    cur = conn.cursor(dictionary=True)
+
+    query = """
+        SELECT p.id, p.title, p.price, p.category, u.name AS seller_name
+        FROM products p
+        JOIN users u ON p.user_id = u.id
+        WHERE 1=1
+    """
+    params = []
+
+    if category:
+        query += " AND p.category = %s"
+        params.append(category)
+
+    if name:
+        query += " AND p.title LIKE %s"
+        params.append(f"%{name}%")
+
+    cur.execute(query, tuple(params))
+    products = cur.fetchall()
+
+    cur.close()
+    conn.close()
+
+    return render_template("dashboard.html", products=products)
+
+@app.route("/product/<int:product_id>")
+def product_details(product_id):
+    conn = get_db_connection()
+    cur = conn.cursor(dictionary=True)
+    cur.execute("SELECT * FROM products WHERE id=%s", (product_id,))
+    product = cur.fetchone()
+
+    if not product:
+        cur.close()
+        conn.close()
+        return "Product not found", 404
+
+    cur.execute("SELECT image_path FROM product_images WHERE product_id=%s", (product_id,))
+    images = cur.fetchall()
+    product["images"] = [img["image_path"] for img in images]
+
+    cur.close()
+    conn.close()
+    return render_template("product_details.html", product=product)
+
+@app.route("/profile")
+def profile():
+    if "user_id" not in session:
+        flash("You must be logged in to view your profile.", "error")
+        return redirect(url_for("login_page"))
+
+    conn = get_db_connection()
+    cur = conn.cursor(dictionary=True)
+    cur.execute("SELECT * FROM users WHERE id = %s", (session["user_id"],))
+    user = cur.fetchone()
+    cur.close()
+    conn.close()
+
+    return render_template("profile.html", user=user)
 
 @app.route("/logout")
 def logout():
@@ -954,6 +1019,9 @@ def send_email_notification(to_email, message, subject_override=None):
         print(f"[EMAIL] Sent to {to_email} with subject '{msg['Subject']}'")
     except Exception as e:
         print("[EMAIL] Send failure:", e)
+ 
+
+
  
 # ---------- RUN ----------
 if __name__ == "__main__":

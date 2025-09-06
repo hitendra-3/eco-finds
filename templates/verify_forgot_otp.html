@@ -3,15 +3,623 @@
 <head>
     <meta charset="UTF-8" />
     <title>Verify Forgot Password OTP</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f8fafc;
+            color: #334155;
+            display: flex;
+            min-height: 100vh;
+            transition: background-color 0.3s, color 0.3s;
+            overflow-x: hidden;
+        }
+        
+        body.dark-mode {
+            background-color: #0f172a;
+            color: #cbd5e1;
+        }
+        
+        .container {
+            display: flex;
+            width: 100%;
+            min-height: 100vh;
+        }
+        
+        .left-panel {
+            flex: 1;
+            background: linear-gradient(135deg, #2E8B57 0%, #1F6B48 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            display: none;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .left-panel::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            transform: rotate(30deg);
+        }
+        
+        .dark-mode .left-panel {
+            background: linear-gradient(135deg, #1F6B48 0%, #13402c 100%);
+        }
+        
+        .eco-icon {
+            font-size: 5rem;
+            margin-bottom: 2rem;
+            position: relative;
+            z-index: 1;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .left-panel h2 {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .left-panel p {
+            font-size: 1.1rem;
+            text-align: center;
+            max-width: 400px;
+            line-height: 1.6;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .benefits {
+            margin-top: 2rem;
+            width: 100%;
+            max-width: 400px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .benefit {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s, background 0.3s;
+        }
+        
+        .benefit:hover {
+            transform: translateX(5px);
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .benefit i {
+            margin-right: 0.75rem;
+            font-size: 1.2rem;
+            width: 24px;
+            text-align: center;
+        }
+        
+        .right-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            background-color: white;
+            transition: background-color 0.3s;
+            position: relative;
+        }
+        
+        .dark-mode .right-panel {
+            background-color: #1e293b;
+        }
+        
+        .verify-card {
+            width: 100%;
+            max-width: 450px;
+            padding: 2.5rem;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            background-color: white;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .verify-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, #2E8B57, #3B82F6, #F59E0B, #8B5CF6);
+        }
+        
+        .dark-mode .verify-card {
+            background-color: #334155;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+        
+        .logo-icon {
+            font-size: 2.5rem;
+            color: #2E8B57;
+            margin-right: 0.75rem;
+            transition: color 0.3s;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .dark-mode .logo-icon {
+            color: #3cb371;
+        }
+        
+        .logo-text {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #2E8B57;
+            transition: color 0.3s;
+        }
+        
+        .dark-mode .logo-text {
+            color: #3cb371;
+        }
+        
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #1e293b;
+            transition: color 0.3s;
+            text-align: center;
+            position: relative;
+            padding-bottom: 15px;
+        }
+        
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(90deg, #2E8B57, #3cb371);
+            border-radius: 2px;
+        }
+        
+        .dark-mode h1 {
+            color: #f1f5f9;
+        }
+        
+        .subtitle {
+            color: #64748b;
+            margin-bottom: 2rem;
+            transition: color 0.3s;
+            text-align: center;
+        }
+        
+        .dark-mode .subtitle {
+            color: #94a3b8;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+            animation: fadeIn 0.5s ease forwards;
+            opacity: 0;
+        }
+        
+        .form-group:nth-child(1) { animation-delay: 0.1s; }
+        .form-group:nth-child(2) { animation-delay: 0.2s; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #374151;
+            transition: color 0.3s;
+        }
+        
+        .dark-mode label {
+            color: #e2e8f0;
+        }
+        
+        .input-with-icon {
+            position: relative;
+        }
+        
+        .input-with-icon i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            transition: color 0.3s;
+            z-index: 1;
+        }
+        
+        .dark-mode .input-with-icon i {
+            color: #cbd5e1;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px 12px 12px 40px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background-color: white;
+            color: #1e293b;
+        }
+        
+        .dark-mode input {
+            background-color: #475569;
+            border-color: #64748b;
+            color: #f1f5f9;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #2E8B57;
+            box-shadow: 0 0 0 3px rgba(46, 139, 87, 0.1);
+        }
+        
+        .dark-mode input:focus {
+            border-color: #3cb371;
+            box-shadow: 0 0 0 3px rgba(60, 179, 113, 0.2);
+        }
+        
+        input::placeholder {
+            color: #94a3b8;
+        }
+        
+        .dark-mode input::placeholder {
+            color: #cbd5e1;
+        }
+        
+        button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #2E8B57 0%, #3cb371 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 6px rgba(46, 139, 87, 0.2);
+            position: relative;
+            overflow: hidden;
+            animation: fadeIn 0.5s ease 0.3s forwards;
+            opacity: 0;
+        }
+        
+        button::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+        
+        button:hover::after {
+            left: 100%;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 12px rgba(46, 139, 87, 0.3);
+        }
+        
+        .dark-mode button {
+            background: linear-gradient(135deg, #3cb371 0%, #2E8B57 100%);
+        }
+        
+        .dark-mode button:hover {
+            box-shadow: 0 5px 12px rgba(60, 179, 113, 0.3);
+        }
+        
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+        
+        .theme-toggle:hover {
+            transform: rotate(15deg);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .dark-mode .theme-toggle {
+            background: linear-gradient(135deg, #475569 0%, #374151 100%);
+        }
+        
+        .theme-toggle i {
+            font-size: 1.3rem;
+            color: #4b5563;
+            transition: color 0.3s;
+        }
+        
+        .dark-mode .theme-toggle i {
+            color: #e2e8f0;
+        }
+        
+        /* Floating shapes animation */
+        .floating-shapes {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+        
+        .shape {
+            position: absolute;
+            opacity: 0.1;
+            border-radius: 50%;
+        }
+        
+        .shape-1 {
+            width: 150px;
+            height: 150px;
+            background: #2E8B57;
+            top: 10%;
+            left: -50px;
+            animation: float-shape 15s infinite ease-in-out;
+        }
+        
+        .shape-2 {
+            width: 100px;
+            height: 100px;
+            background: #3B82F6;
+            bottom: 20%;
+            right: -30px;
+            animation: float-shape 12s infinite ease-in-out 1s;
+        }
+        
+        .shape-3 {
+            width: 80px;
+            height: 80px;
+            background: #F59E0B;
+            top: 50%;
+            left: -20px;
+            animation: float-shape 18s infinite ease-in-out 2s;
+        }
+        
+        @keyframes float-shape {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(10deg); }
+        }
+        
+        .dark-mode .shape {
+            opacity: 0.05;
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #2E8B57;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #1F6B48;
+        }
+        
+        .dark-mode ::-webkit-scrollbar-track {
+            background: #475569;
+        }
+        
+        .dark-mode ::-webkit-scrollbar-thumb {
+            background: #3cb371;
+        }
+        
+        .dark-mode ::-webkit-scrollbar-thumb:hover {
+            background: #2E8B57;
+        }
+        
+        /* Responsive design */
+        @media (min-width: 768px) {
+            .left-panel {
+                display: flex;
+            }
+            
+            .theme-toggle {
+                top: 30px;
+                right: 30px;
+            }
+        }
+        
+        @media (max-width: 767px) {
+            .verify-card {
+                padding: 2rem;
+                box-shadow: none;
+            }
+            
+            .right-panel {
+                padding: 1rem;
+            }
+            
+            .floating-shapes {
+                display: none;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h1>Verify OTP for Password Reset</h1>
-    <form id="verify-otp-form">
-        <label>User ID: <input type="text" name="user_id" required /></label><br />
-        <label>OTP: <input type="text" name="otp" required /></label><br />
-        <button type="submit">Verify OTP</button>
-    </form>
+    <button class="theme-toggle" id="theme-toggle">
+        <i class="fas fa-moon"></i>
+    </button>
+    
+    <div class="container">
+        <div class="left-panel">
+            <div class="floating-shapes">
+                <div class="shape shape-1"></div>
+                <div class="shape shape-2"></div>
+                <div class="shape shape-3"></div>
+            </div>
+            <div class="eco-icon">
+                <i class="fas fa-leaf"></i>
+            </div>
+            <h2>Reset Your Password Securely</h2>
+            <p>Enter the OTP sent to your email to securely reset your password and regain access to your account.</p>
+            
+            <div class="benefits">
+                <div class="benefit">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Secure account recovery process</span>
+                </div>
+                <div class="benefit">
+                    <i class="fas fa-lock"></i>
+                    <span>Protect your personal information</span>
+                </div>
+                <div class="benefit">
+                    <i class="fas fa-clock"></i>
+                    <span>OTP expires for added security</span>
+                </div>
+                <div class="benefit">
+                    <i class="fas fa-user-check"></i>
+                    <span>Quickly regain access to your account</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="right-panel">
+            <div class="floating-shapes">
+                <div class="shape shape-1"></div>
+                <div class="shape shape-2"></div>
+                <div class="shape shape-3"></div>
+            </div>
+            <div class="verify-card">
+                <div class="logo">
+                    <i class="fas fa-leaf logo-icon"></i>
+                    <div class="logo-text">EcoFinds</div>
+                </div>
+                
+                <h1>Verify OTP</h1>
+                <p class="subtitle">Enter the OTP sent to your email to reset your password</p>
+                
+                <form id="verify-otp-form">
+                    <div class="form-group">
+                        <label for="user_id">User ID</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-user"></i>
+                            <input type="text" id="user_id" name="user_id" placeholder="Enter your user ID" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="otp">OTP Code</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-key"></i>
+                            <input type="text" id="otp" name="otp" placeholder="Enter the OTP code" required>
+                        </div>
+                    </div>
+                    
+                    <button type="submit">Verify OTP</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <script>
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = themeToggle.querySelector('i');
+        
+        // Check for saved theme preference or respect OS preference
+        const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+        const currentTheme = localStorage.getItem('theme');
+        
+        if (currentTheme === 'dark' || (!currentTheme && prefersDarkScheme.matches)) {
+            document.body.classList.add('dark-mode');
+            themeIcon.classList.remove('fa-moon');
+            themeIcon.classList.add('fa-sun');
+        }
+        
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            
+            if (document.body.classList.contains('dark-mode')) {
+                localStorage.setItem('theme', 'dark');
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+            } else {
+                localStorage.setItem('theme', 'light');
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+            }
+        });
+
+        // Original form submission code (unchanged)
         document.getElementById('verify-otp-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const formData = new FormData(e.target);

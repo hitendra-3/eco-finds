@@ -3,13 +3,137 @@
 <head>
   <meta charset="UTF-8">
   <title>My Cart</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    .cart-item { border: 1px solid #ccc; padding: 10px; margin: 10px; border-radius: 4px; }
-    .flash-success { color: green; }
-    .flash-error { color: red; }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+
+    body {
+      background-color: #f8fafc;
+      color: #334155;
+      min-height: 100vh;
+      transition: background-color 0.3s, color 0.3s;
+      overflow-x: hidden;
+      padding: 2rem;
+    }
+
+    body.dark-mode { background-color: #0f172a; color: #cbd5e1; }
+
+    h1 {
+      font-size: 2rem;
+      font-weight: 600;
+      text-align: center;
+      margin-bottom: 1.5rem;
+      color: #1e293b;
+      position: relative;
+    }
+    h1::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 4px;
+      background: linear-gradient(90deg, #2E8B57, #3cb371);
+      border-radius: 2px;
+    }
+    .dark-mode h1 { color: #f1f5f9; }
+
+    .cart-item {
+      background: white;
+      padding: 1.5rem;
+      margin: 1rem auto;
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+      max-width: 600px;
+      animation: fadeIn 0.6s ease forwards;
+      opacity: 0;
+    }
+    .cart-item:nth-child(1) { animation-delay: 0.1s; }
+    .cart-item:nth-child(2) { animation-delay: 0.2s; }
+    .cart-item:nth-child(3) { animation-delay: 0.3s; }
+
+    .dark-mode .cart-item { background: #334155; box-shadow: 0 8px 20px rgba(0,0,0,0.25); }
+
+    h2 { font-size: 1.3rem; margin-bottom: 0.5rem; }
+
+    p { margin-bottom: 0.5rem; color: #64748b; }
+    .dark-mode p { color: #94a3b8; }
+
+    form button {
+      padding: 10px 20px;
+      background: linear-gradient(135deg, #2E8B57, #3cb371);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 3px 6px rgba(46, 139, 87, 0.2);
+    }
+    form button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 12px rgba(46, 139, 87, 0.3);
+    }
+    .dark-mode form button { background: linear-gradient(135deg, #3cb371, #2E8B57); }
+
+    a {
+      color: #2E8B57;
+      font-weight: 600;
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+    a:hover { text-decoration: underline; }
+    .dark-mode a { color: #3cb371; }
+
+    .flash-success { color: #2E8B57; font-weight: 600; text-align: center; margin-bottom: 1rem; }
+    .flash-error { color: #e11d48; font-weight: 600; text-align: center; margin-bottom: 1rem; }
+
+    .theme-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+      z-index: 100;
+    }
+    .theme-toggle:hover { transform: rotate(15deg); box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
+    .dark-mode .theme-toggle { background: linear-gradient(135deg, #475569, #374151); }
+    .theme-toggle i { font-size: 1.3rem; color: #4b5563; transition: color 0.3s; }
+    .dark-mode .theme-toggle i { color: #e2e8f0; }
+
+    /* Floating shapes */
+    .floating-shapes { position: fixed; width: 100%; height: 100%; overflow: hidden; top: 0; left: 0; z-index: -1; }
+    .shape { position: absolute; opacity: 0.1; border-radius: 50%; }
+    .shape-1 { width: 150px; height: 150px; background: #2E8B57; top: 10%; left: -50px; animation: float-shape 15s infinite ease-in-out; }
+    .shape-2 { width: 100px; height: 100px; background: #3B82F6; bottom: 20%; right: -30px; animation: float-shape 12s infinite ease-in-out 1s; }
+    .shape-3 { width: 80px; height: 80px; background: #F59E0B; top: 50%; left: -20px; animation: float-shape 18s infinite ease-in-out 2s; }
+    @keyframes float-shape { 0%,100%{transform:translateY(0) rotate(0);} 50%{transform:translateY(-20px) rotate(10deg);} }
+    .dark-mode .shape { opacity: 0.05; }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
   </style>
 </head>
 <body>
+  <button class="theme-toggle" id="theme-toggle"><i class="fas fa-moon"></i></button>
+
+  <div class="floating-shapes">
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+  </div>
+
   <h1>My Cart</h1>
 
   {% with messages = get_flashed_messages(with_categories=true) %}
@@ -26,17 +150,41 @@
         <h2>{{ item.title }}</h2>
         <p>Price: ₹{{ item.price }}</p>
         <p>Seller: {{ item.seller_name }} ({{ item.seller_email }})</p>
-
-        <!-- Buy from cart -->
         <form method="GET" action="{{ url_for('buy_product', product_id=item.product_id) }}">
           <button type="submit">Proceed to Buy</button>
         </form>
       </div>
     {% endfor %}
   {% else %}
-    <p>Your cart is empty.</p>
+    <p style="text-align:center;">Your cart is empty.</p>
   {% endif %}
 
-  <p><a href="{{ url_for('all_products') }}">Continue Shopping</a></p>
+  <p style="text-align:center; margin-top:2rem;"><a href="{{ url_for('all_products') }}">Continue Shopping</a></p>
+
+  <script>
+    const themeToggle = document.getElementById('theme-toggle');
+    const themeIcon = themeToggle.querySelector('i');
+    const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    const currentTheme = localStorage.getItem('theme');
+
+    if (currentTheme === 'dark' || (!currentTheme && prefersDarkScheme.matches)) {
+      document.body.classList.add('dark-mode');
+      themeIcon.classList.remove('fa-moon');
+      themeIcon.classList.add('fa-sun');
+    }
+
+    themeToggle.addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+      if (document.body.classList.contains('dark-mode')) {
+        localStorage.setItem('theme', 'dark');
+        themeIcon.classList.remove('fa-moon');
+        themeIcon.classList.add('fa-sun');
+      } else {
+        localStorage.setItem('theme', 'light');
+        themeIcon.classList.remove('fa-sun');
+        themeIcon.classList.add('fa-moon');
+      }
+    });
+  </script>
 </body>
 </html>

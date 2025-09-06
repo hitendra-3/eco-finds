@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Payment Success</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+
+    body {
+      background-color: #f8fafc;
+      color: #334155;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      overflow: hidden;
+      position: relative;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    body.dark-mode { background-color: #0f172a; color: #cbd5e1; }
+
+    /* Floating shapes background */
+    .floating-shapes { position: fixed; width: 100%; height: 100%; overflow: hidden; inset: 0; z-index: -1; }
+    .shape { position: absolute; opacity: 0.1; border-radius: 50%; filter: blur(0.3px); }
+    .shape-1 { width: 160px; height: 160px; background: #2E8B57; top: 10%; left: -50px; animation: float-shape 15s infinite ease-in-out; }
+    .shape-2 { width: 110px; height: 110px; background: #3B82F6; bottom: 20%; right: -30px; animation: float-shape 12s infinite ease-in-out 1s; }
+    .shape-3 { width: 90px; height: 90px; background: #F59E0B; top: 55%; left: -20px; animation: float-shape 18s infinite ease-in-out 2s; }
+    @keyframes float-shape { 0%,100%{transform:translateY(0) rotate(0);} 50%{transform:translateY(-20px) rotate(10deg);} }
+    .dark-mode .shape { opacity: 0.05; }
+
+    /* Theme toggle */
+    .theme-toggle {
+      position: fixed; top: 20px; right: 20px; z-index: 10;
+      width: 50px; height: 50px; border-radius: 50%; border: none; cursor: pointer;
+      display: grid; place-items: center; transition: transform 0.3s, box-shadow 0.3s;
+      background: linear-gradient(135deg, #f1f5f9, #e2e8f0); box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    .theme-toggle:hover { transform: rotate(15deg) scale(1.03); box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
+    .theme-toggle i { font-size: 1.3rem; color: #4b5563; transition: color 0.3s; }
+    .dark-mode .theme-toggle { background: linear-gradient(135deg, #475569, #374151); }
+    .dark-mode .theme-toggle i { color: #e2e8f0; }
+
+    /* Checkmark with pulsing ring */
+    .checkmark { width: 140px; height: 140px; border-radius: 50%; background: #2E8B57; display: grid; place-items: center; position: relative; box-shadow: 0 0 25px rgba(46,139,87,0.4); animation: pop 0.6s ease forwards; }
+    .checkmark::before { content: ""; position: absolute; width: 180px; height: 180px; border-radius: 50%; border: 4px solid rgba(46,139,87,0.45); animation: pulse-ring 2s infinite ease-out; }
+    .checkmark svg { width: 82px; height: 82px; stroke: #fff; stroke-width: 6; fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 48; stroke-dashoffset: 48; animation: draw 1s ease forwards 0.5s; }
+    @keyframes draw { to { stroke-dashoffset: 0; } }
+    @keyframes pop { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+    @keyframes pulse-ring { 0% { transform: scale(0.5); opacity: 0.9; } 100% { transform: scale(1.6); opacity: 0; } }
+
+    /* Heading with gradient shimmer */
+    h1 { font-size: 2.5rem; margin-top: 1.5rem; margin-bottom: 1rem; background: linear-gradient(90deg, #2E8B57, #3CB371, #2E8B57); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: shimmer 3s linear infinite; }
+    .dark-mode h1 { filter: drop-shadow(0 2px 8px rgba(46,139,87,0.25)); }
+    @keyframes shimmer { to { background-position: 200% center; } }
+
+    /* Details */
+    .details { margin-top: 1rem; font-size: 1.08rem; color: #64748b; opacity: 0; animation: floatUp 0.9s ease forwards 0.4s; }
+    .dark-mode .details { color: #94a3b8; }
+    @keyframes floatUp { 0% { transform: translateY(24px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
+
+    /* CTA button */
+    a.cta { margin-top: 2rem; display: inline-block; padding: 14px 28px; background: linear-gradient(135deg, #2E8B57, #3CB371); color: #fff; border-radius: 12px; font-weight: 700; text-decoration: none; transition: transform 0.25s ease, box-shadow 0.25s ease; position: relative; overflow: hidden; }
+    a.cta::before { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent); transform: translateX(-100%) skewX(-20deg); }
+    a.cta:hover::before { transform: translateX(100%) skewX(-20deg); transition: transform 0.7s ease; }
+    a.cta:hover { transform: translateY(-3px); box-shadow: 0 8px 18px rgba(46,139,87,0.35); }
+    .dark-mode a.cta { background: linear-gradient(135deg, #3CB371, #2E8B57); }
+
+    /* Confetti */
+    .confetti { position: fixed; top: -10px; width: 10px; height: 10px; background: red; opacity: 0.85; animation: fall linear forwards; z-index: 5; pointer-events: none; }
+    @keyframes fall { to { transform: translateY(110vh) rotate(720deg); opacity: 0; } }
+
+    /* Reduced motion support */
+    @media (prefers-reduced-motion: reduce) {
+      .shape, .checkmark::before, .checkmark svg, .confetti, h1, .details, a.cta::before { animation: none !important; transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Theme toggle -->
+  <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode"><i class="fas fa-moon" aria-hidden="true"></i></button>
+
+  <!-- Background shapes -->
+  <div class="floating-shapes" aria-hidden="true">
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+  </div>
+
+  <!-- Success icon -->
+  <div class="checkmark" role="img" aria-label="Payment succeeded">
+    <svg viewBox="0 0 52 52" aria-hidden="true">
+      <path d="M14 27l7 7 17-17" />
+    </svg>
+  </div>
+
+  <h1>Payment Successful!</h1>
+
+  <div class="details">
+    <p>Order ID: <strong>{{ order_id }}</strong></p>
+    <p>Product: {{ product.title }}</p>
+    <p>Price: ₹{{ product.price }}</p>
+    <p>Payment Method: {{ payment_type }}</p>
+  </div>
+
+  <p style="margin-top: 1rem;">Thank you for booking with EcoFinds!</p>
+
+  <a class="cta" href="{{ url_for('all_products') }}">Back to Products</a>
+
+  <script>
+    // --- Theme toggle with persistence & OS fallback ---
+    const themeToggle = document.getElementById('theme-toggle');
+    const themeIcon = themeToggle.querySelector('i');
+    const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    const savedTheme = localStorage.getItem('theme');
+
+    function applyTheme(theme) {
+      const dark = theme === 'dark' || (!theme && prefersDarkScheme.matches);
+      document.body.classList.toggle('dark-mode', dark);
+      themeIcon.classList.toggle('fa-sun', dark);
+      themeIcon.classList.toggle('fa-moon', !dark);
+    }
+
+    applyTheme(savedTheme);
+
+    themeToggle.addEventListener('click', () => {
+      const next = document.body.classList.contains('dark-mode') ? 'light' : 'dark';
+      localStorage.setItem('theme', next);
+      applyTheme(next);
+    });
+
+    // --- Confetti burst ---
+    function launchConfetti(count = 60) {
+      const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (prefersReduced) return;
+      for (let i = 0; i < count; i++) {
+        const c = document.createElement('div');
+        c.className = 'confetti';
+        c.style.left = Math.random() * 100 + 'vw';
+        const size = Math.random() * 8 + 5;
+        c.style.width = size + 'px';
+        c.style.height = size + 'px';
+        c.style.background = `hsl(${Math.random() * 360}, 85%, 55%)`;
+        c.style.animationDuration = (Math.random() * 3 + 2) + 's';
+        c.style.animationDelay = (Math.random() * 0.5) + 's';
+        document.body.appendChild(c);
+        setTimeout(() => c.remove(), 5000);
+      }
+    }
+
+    // Fire confetti shortly after the checkmark draws
+    setTimeout(() => launchConfetti(70), 1100);
+  </script>
+</body>
+</html>

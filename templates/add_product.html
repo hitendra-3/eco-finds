@@ -1,23 +1,550 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
     <title>Add Product</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            color: #334155;
+            padding: 2rem;
+            transition: background-color 0.3s, color 0.3s;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        body.dark-mode {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #cbd5e1;
+        }
+        
+        .container {
+            max-width: 650px;
+            width: 100%;
+            margin: 0 auto;
+            background: white;
+            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            border: 3px solid #2E8B57;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, #2E8B57, #3B82F6, #F59E0B, #8B5CF6);
+            z-index: 1;
+        }
+        
+        .dark-mode .container {
+            background-color: #334155;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            border-color: #3cb371;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #2E8B57;
+        }
+        
+        .dark-mode .header {
+            border-bottom-color: #3cb371;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo-icon {
+            font-size: 2.5rem;
+            color: #2E8B57;
+            margin-right: 0.75rem;
+            transition: color 0.3s;
+        }
+        
+        .dark-mode .logo-icon {
+            color: #3cb371;
+        }
+        
+        .logo-text {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #2E8B57;
+            transition: color 0.3s;
+        }
+        
+        .dark-mode .logo-text {
+            color: #3cb371;
+        }
+        
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            color: #1e293b;
+            text-align: center;
+            transition: color 0.3s;
+            position: relative;
+            padding-bottom: 15px;
+        }
+        
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, #2E8B57, #3cb371);
+            border-radius: 2px;
+        }
+        
+        .dark-mode h1 {
+            color: #f1f5f9;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+        
+        .nav-link {
+            color: #2E8B57;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 0.5rem 1rem;
+            border-radius: 30px;
+            transition: all 0.3s;
+            border: 2px solid #2E8B57;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: #2E8B57;
+            transition: all 0.4s;
+            z-index: -1;
+        }
+        
+        .nav-link:hover::before {
+            left: 0;
+        }
+        
+        .nav-link:hover {
+            color: white;
+        }
+        
+        .dark-mode .nav-link {
+            color: #3cb371;
+            border-color: #3cb371;
+        }
+        
+        .dark-mode .nav-link::before {
+            background: #3cb371;
+        }
+        
+        .dark-mode .nav-link:hover {
+            color: white;
+        }
+        
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.8rem;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            position: relative;
+        }
+        
+        label {
+            font-weight: 600;
+            color: #1e293b;
+            transition: color 0.3s;
+            font-size: 1.05rem;
+            padding-left: 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        label i {
+            color: #2E8B57;
+            width: 20px;
+        }
+        
+        .dark-mode label {
+            color: #f1f5f9;
+        }
+        
+        .dark-mode label i {
+            color: #3cb371;
+        }
+        
+        input, textarea {
+            padding: 1rem 1.2rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            background: #f8fafc;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #2E8B57;
+            box-shadow: 0 0 0 3px rgba(46, 139, 87, 0.2), inset 0 2px 4px rgba(0, 0, 0, 0.05);
+            background: white;
+            transform: translateY(-2px);
+        }
+        
+        .dark-mode input, 
+        .dark-mode textarea {
+            background-color: #475569;
+            border-color: #64748b;
+            color: #f1f5f9;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .dark-mode input:focus, 
+        .dark-mode textarea:focus {
+            border-color: #3cb371;
+            box-shadow: 0 0 0 3px rgba(60, 179, 113, 0.2), inset 0 2px 4px rgba(0, 0, 0, 0.1);
+            background: #374151;
+        }
+        
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        button[type="submit"] {
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, #2E8B57 0%, #3cb371 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 1rem;
+            box-shadow: 0 4px 6px rgba(46, 139, 87, 0.3);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        button[type="submit"]::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #3cb371 0%, #2E8B57 100%);
+            transition: all 0.4s;
+            z-index: -1;
+        }
+        
+        button[type="submit"]:hover::before {
+            left: 0;
+        }
+        
+        button[type="submit"]:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 14px rgba(46, 139, 87, 0.4);
+        }
+        
+        button[type="submit"]:active {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 10px rgba(46, 139, 87, 0.3);
+        }
+        
+        .dark-mode button[type="submit"] {
+            box-shadow: 0 4px 6px rgba(60, 179, 113, 0.3);
+        }
+        
+        .dark-mode button[type="submit"]:hover {
+            box-shadow: 0 7px 14px rgba(60, 179, 113, 0.4);
+        }
+        
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 2rem;
+            color: #2E8B57;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            text-align: center;
+            width: 100%;
+            gap: 8px;
+            padding: 0.8rem;
+            border: 2px solid #2E8B57;
+            border-radius: 12px;
+        }
+        
+        .back-link:hover {
+            background-color: #2E8B57;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(46, 139, 87, 0.2);
+        }
+        
+        .dark-mode .back-link {
+            color: #3cb371;
+            border-color: #3cb371;
+        }
+        
+        .dark-mode .back-link:hover {
+            background-color: #3cb371;
+            color: white;
+            box-shadow: 0 4px 8px rgba(60, 179, 113, 0.2);
+        }
+        
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+            z-index: 100;
+        }
+        
+        .theme-toggle:hover {
+            transform: rotate(15deg);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .dark-mode .theme-toggle {
+            background: linear-gradient(135deg, #475569 0%, #374151 100%);
+        }
+        
+        .theme-toggle i {
+            font-size: 1.3rem;
+            color: #4b5563;
+            transition: color 0.3s;
+        }
+        
+        .dark-mode .theme-toggle i {
+            color: #e2e8f0;
+        }
+        
+        .file-input-info {
+            font-size: 0.9rem;
+            color: #64748b;
+            margin-top: 0.4rem;
+            padding-left: 5px;
+            transition: color 0.3s;
+        }
+        
+        .dark-mode .file-input-info {
+            color: #94a3b8;
+        }
+        
+        input[type="file"] {
+            padding: 0.8rem;
+            background: #f8fafc;
+            border: 2px dashed #cbd5e1;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        input[type="file"]:hover {
+            border-color: #2E8B57;
+            background: #f0fdf4;
+        }
+        
+        input[type="file"]::file-selector-button {
+            padding: 0.6rem 1.2rem;
+            background: #2E8B57;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-right: 1rem;
+        }
+        
+        input[type="file"]::file-selector-button:hover {
+            background: #1F6B48;
+        }
+        
+        .dark-mode input[type="file"] {
+            background: #475569;
+            border-color: #64748b;
+        }
+        
+        .dark-mode input[type="file"]:hover {
+            border-color: #3cb371;
+            background: #1a3c2b;
+        }
+        
+        .dark-mode input[type="file"]::file-selector-button {
+            background: #3cb371;
+        }
+        
+        .dark-mode input[type="file"]::file-selector-button:hover {
+            background: #2E8B57;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+            
+            .container {
+                padding: 1.5rem;
+            }
+            
+            .header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+            
+            .nav-links {
+                justify-content: center;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h1>Add Product</h1>
-    <form action="{{ url_for('add_product') }}" method="POST" enctype="multipart/form-data">
-        <label>Title: <input type="text" name="title" required></label><br><br>
-        <label>Description:<br>
-            <textarea name="description"></textarea>
-        </label><br><br>
-        <label>Category: <input type="text" name="category"></label><br><br>
-        <label>Price: <input type="number" step="0.01" name="price" required></label><br><br>
-        <label>Contact: <input type="text" name="contact" required></label><br><br>
-        <label>Images: <input type="file" name="images" multiple></label><br><br>
-        <button type="submit">Add Product</button>
-    </form>
-    <br>
-    <a href="{{ url_for('dashboard') }}">Back to Dashboard</a>
+    <button class="theme-toggle" id="theme-toggle">
+        <i class="fas fa-moon"></i>
+    </button>
+    
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <i class="fas fa-leaf logo-icon"></i>
+                <div class="logo-text">EcoFinds</div>
+            </div>
+            
+            <div class="nav-links">
+                <a href="{{ url_for('add_product_page') }}" class="nav-link">Add New Product</a>
+                <a href="{{ url_for('dashboard') }}" class="nav-link">Dashboard</a>
+            </div>
+        </div>
+        
+        <h1>Add Product</h1>
+        
+        <form action="{{ url_for('add_product') }}" method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label><i class="fas fa-heading"></i>Title:</label>
+                <input type="text" name="title" required placeholder="Enter product title">
+            </div>
+            
+            <div class="form-group">
+                <label><i class="fas fa-align-left"></i>Description:</label>
+                <textarea name="description" placeholder="Describe your product in detail"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label><i class="fas fa-tag"></i>Category:</label>
+                <input type="text" name="category" placeholder="e.g., Furniture, Kitchenware">
+            </div>
+            
+            <div class="form-group">
+                <label><i class="fas fa-dollar-sign"></i>Price:</label>
+                <input type="number" step="0.01" name="price" required placeholder="0.00">
+            </div>
+            
+            <div class="form-group">
+                <label><i class="fas fa-envelope"></i>Contact:</label>
+                <input type="text" name="contact" required placeholder="Your contact information">
+            </div>
+            
+            <div class="form-group">
+                <label><i class="fas fa-images"></i>Images:</label>
+                <input type="file" name="images" multiple>
+                <span class="file-input-info">You can select multiple images (JPEG, PNG, GIF)</span>
+            </div>
+            
+            <button type="submit"><i class="fas fa-plus-circle"></i> Add Product</button>
+        </form>
+        
+        <a href="{{ url_for('dashboard') }}" class="back-link"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = themeToggle.querySelector('i');
+        
+        // Check for saved theme preference or respect OS preference
+        const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+        const currentTheme = localStorage.getItem('theme');
+        
+        if (currentTheme === 'dark' || (!currentTheme && prefersDarkScheme.matches)) {
+            document.body.classList.add('dark-mode');
+            themeIcon.classList.remove('fa-moon');
+            themeIcon.classList.add('fa-sun');
+        }
+        
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            
+            if (document.body.classList.contains('dark-mode')) {
+                localStorage.setItem('theme', 'dark');
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+            } else {
+                localStorage.setItem('theme', 'light');
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+            }
+        });
+    </script>
 </body>
 </html>

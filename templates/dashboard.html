@@ -1,26 +1,210 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <title>Dashboard</title>
+<meta charset="UTF-8">
+<title>Dashboard | EcoFinds</title>
+<style>
+    /* Reset */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #d9f0e7, #f0fff4);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        color: #333;
+    }
+
+    /* Header */
+    header {
+        background: linear-gradient(135deg, #2E8B57, #3CB371);
+        color: #fff;
+        padding: 30px 20px;
+        text-align: center;
+        font-size: 28px;
+        letter-spacing: 1px;
+        box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+        border-bottom-left-radius: 15px;
+        border-bottom-right-radius: 15px;
+    }
+
+    /* Navigation */
+    nav {
+        background: rgba(46, 139, 87, 0.9);
+        margin: 15px 40px 0 40px;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    nav ul {
+        list-style: none;
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    nav ul li { margin: 10px 15px; }
+    nav ul li a {
+        color: #fff;
+        text-decoration: none;
+        font-weight: 600;
+        padding: 10px 18px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+    nav ul li a:hover { background: #3CB371; transform: scale(1.1); }
+
+    /* Search */
+    .search-container {
+        text-align: center;
+        margin: 30px 0;
+    }
+    .search-container input,
+    .search-container select,
+    .search-container button {
+        padding: 12px 18px;
+        margin: 5px;
+        font-size: 15px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        transition: all 0.3s ease;
+    }
+    .search-container input:focus,
+    .search-container select:focus { outline: none; border-color: #2E8B57; box-shadow: 0 0 10px rgba(46,139,87,0.3); }
+    .search-container button { background: #2E8B57; color: #fff; border: none; cursor: pointer; font-weight: bold; }
+    .search-container button:hover { background: #3CB371; }
+
+    /* Products Grid */
+    .products {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 25px;
+        padding: 20px 40px;
+        flex-grow: 1;
+    }
+    .product-card {
+        background: rgba(255,255,255,0.95);
+        border-radius: 15px;
+        padding: 25px 20px;
+        text-align: center;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        backdrop-filter: blur(5px);
+    }
+    .product-card:hover { transform: translateY(-10px) scale(1.02); box-shadow: 0 14px 30px rgba(0,0,0,0.18); }
+    .product-card h3 { font-size: 22px; color: #2E8B57; margin-bottom: 12px; }
+    .product-card p { font-size: 15px; margin: 8px 0; color: #555; }
+    .product-link { text-decoration: none; color: inherit; display: block; }
+
+    /* Footer */
+    footer {
+        background: linear-gradient(135deg, rgba(46,139,87,0.9), rgba(60,179,113,0.8));
+        color: #fff;
+        padding: 40px 30px 20px 30px;
+        margin-top: 40px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        border-top-left-radius: 20px;
+        border-top-right-radius: 20px;
+        backdrop-filter: blur(5px);
+    }
+    footer .footer-section { flex: 1 1 250px; margin: 15px; }
+    footer h3 { font-size: 18px; margin-bottom: 15px; color: #fff; }
+    footer p, footer a { font-size: 14px; color: #f0f0f0; line-height: 1.6; text-decoration: none; }
+    footer a:hover { color: #c8f7dc; }
+    footer .social-icons { margin-top: 10px; }
+    footer .social-icons a { display: inline-block; margin-right: 10px; color: #fff; font-size: 18px; transition: color 0.3s; }
+    footer .social-icons a:hover { color: #c8f7dc; }
+
+    /* Responsive */
+    @media(max-width: 768px) { footer { flex-direction: column; align-items: center; text-align: center; } }
+    @media(max-width: 600px) { nav ul { flex-direction: column; align-items: center; } nav ul li { margin: 5px 0; } }
+
+</style>
 </head>
 <body>
-    <h1>Welcome to Your Dashboard</h1>
 
-    <!-- Add navigation buttons -->
-    <nav>
+<header>Sustainable Second-Hand Marketplace</header>
+
+<nav>
     <ul>
+        <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
         <li><a href="{{ url_for('my_products') }}">My Products</a></li>
-        <li><a href="{{ url_for('add_product_page') }}">Add New Product</a></li>
+        <li><a href="{{ url_for('add_product_page') }}">Add Product</a></li>
         <li><a href="{{ url_for('all_products') }}">All Products</a></li>
-       <a href="{{ url_for('view_cart') }}">View Your Cart</a>
-
+        <li><a href="{{ url_for('view_cart') }}">Cart</a></li>
+        <li><a href="{{ url_for('profile') }}">Profile</a></li>
         <li><a href="{{ url_for('logout') }}">Logout</a></li>
     </ul>
 </nav>
 
+<div class="search-container">
+    <form id="searchForm" method="get" action="{{ url_for('dashboard') }}">
+        <input type="text" name="name" placeholder="Search by product name" value="{{ request.args.get('name','') }}">
+        <select name="category">
+            <option value="">All Categories</option>
+            <option value="Books" {% if request.args.get('category')=='Books' %}selected{% endif %}>Books</option>
+            <option value="Electronics" {% if request.args.get('category')=='Electronics' %}selected{% endif %}>Electronics</option>
+            <option value="Household" {% if request.args.get('category')=='Household' %}selected{% endif %}>Household</option>
+            <option value="Appliances" {% if request.args.get('category')=='Appliances' %}selected{% endif %}>Appliances</option>
+            <option value="Others" {% if request.args.get('category')=='Others' %}selected{% endif %}>Others</option>
+        </select>
+        <button type="submit">Search</button>
+    </form>
+</div>
 
-    <!-- Your existing dashboard content here -->
+<div class="products">
+    {% for product in products %}
+    <a class="product-link" href="{{ url_for('all_products') }}?search={{ product.title }}">
+        <div class="product-card">
+            <h3>{{ product.title }}</h3>
+            <p>Category: {{ product.category }}</p>
+            <p>Price: ₹{{ product.price }}</p>
+            <p>Seller: {{ product.seller_name }}</p>
+        </div>
+    </a>
+    {% endfor %}
+</div>
+
+<footer>
+    <!-- About Section -->
+    <div class="footer-section">
+        <h3>About EcoFinds</h3>
+        <p>EcoFinds is a sustainable second-hand marketplace connecting buyers and sellers to reduce waste and promote eco-friendly shopping.</p>
+    </div>
+
+    <!-- Quick Links -->
+    <div class="footer-section">
+        <h3>Quick Links</h3>
+        <p><a href="{{ url_for('dashboard') }}">Dashboard</a></p>
+        <p><a href="{{ url_for('all_products') }}">All Products</a></p>
+        <p><a href="{{ url_for('add_product_page') }}">Add Product</a></p>
+        <p><a href="{{ url_for('profile') }}">Profile</a></p>
+    </div>
+
+    <!-- Contact -->
+    <div class="footer-section">
+        <h3>Contact Us</h3>
+        <p>Email: bytrix.hackathon@gmail.com</p>
+        <p>Phone: +91 98765 43210</p>
+        <p>Address: AECS Layout CMRIT, Bangalore, India</p>
+        <div class="social-icons">
+            <a href="#" title="Facebook">&#xf09a;</a>
+            <a href="#" title="Twitter">&#xf099;</a>
+            <a href="#" title="Instagram">&#xf16d;</a>
+        </div>
+    </div>
+</footer>
+
+<script>
+    document.getElementById('searchForm').addEventListener('submit', function(e){
+        let input = this.name.value.trim();
+        if(input.length < 2 && this.category.value === ""){
+            alert("Please enter at least 2 characters or select a category to search.");
+            e.preventDefault();
+        }
+    });
+</script>
 
 </body>
 </html>

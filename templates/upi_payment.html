@@ -1,18 +1,274 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>UPI Payment</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+
+    body {
+      background-color: #f8fafc;
+      color: #334155;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.3s, color 0.3s;
+      overflow: hidden;
+    }
+    body.dark-mode { background-color: #0f172a; color: #cbd5e1; }
+
+    /* Floating shapes */
+    .floating-shapes { position: fixed; inset: 0; z-index: 0; overflow: hidden; }
+    .shape { position: absolute; opacity: 0.1; border-radius: 50%; }
+    .shape-1 { width: 160px; height: 160px; background: #2E8B57; top: 10%; left: -50px; animation: float-shape 15s infinite ease-in-out; }
+    .shape-2 { width: 110px; height: 110px; background: #3B82F6; bottom: 20%; right: -30px; animation: float-shape 12s infinite ease-in-out 1s; }
+    .shape-3 { width: 90px; height: 90px; background: #F59E0B; top: 55%; left: -20px; animation: float-shape 18s infinite ease-in-out 2s; }
+    @keyframes float-shape { 0%,100%{transform:translateY(0) rotate(0);} 50%{transform:translateY(-20px) rotate(10deg);} }
+    .dark-mode .shape { opacity: 0.05; }
+
+    /* Page container */
+    .container {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 520px;
+      background: #ffffff;
+      border-radius: 18px;
+      padding: 2.25rem 2rem 2rem;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+      animation: fadeIn 0.7s ease both;
+      overflow: hidden;
+    }
+    .container::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 6px;
+      background: linear-gradient(90deg, #2E8B57, #3B82F6, #F59E0B, #8B5CF6);
+    }
+    .dark-mode .container { background: #1e293b; box-shadow: 0 12px 30px rgba(0,0,0,0.45); }
+
+    /* Header */
+    .brand { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 0.5rem; }
+    .brand .logo { font-size: 1.8rem; color: #2E8B57; animation: pulse 2s infinite; }
+    .dark-mode .brand .logo { color: #3CB371; }
+    .brand .text { font-weight: 800; color: #2E8B57; letter-spacing: 0.3px; }
+    .dark-mode .brand .text { color: #3CB371; }
+
+    h1 {
+      text-align: center; font-size: 2rem; margin: 0.6rem 0 0.3rem 0;
+      background: linear-gradient(90deg,#2E8B57,#3CB371,#2E8B57);
+      background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      animation: shimmer 3s linear infinite;
+      position: relative; padding-bottom: 12px;
+    }
+    h1::after { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 64px; height: 4px; background: linear-gradient(90deg,#2E8B57,#3CB371); border-radius: 2px; }
+
+    .meta { text-align: center; color: #64748b; margin-bottom: 1.2rem; }
+    .dark-mode .meta { color: #94a3b8; }
+
+    /* Form */
+    form { margin-top: 0.5rem; }
+    .form-group { margin-top: 1rem; animation: fieldIn 0.5s ease both; }
+    .input-with-icon { position: relative; }
+    .input-with-icon i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #94a3b8; z-index: 1; }
+    .dark-mode .input-with-icon i { color: #cbd5e1; }
+
+    input[type="text"] {
+      width: 100%; padding: 12px 12px 12px 40px; border: 1px solid #d1d5db; border-radius: 10px;
+      background: #ffffff; color: #1f2937; font-size: 1rem; transition: border 0.25s, box-shadow 0.25s, transform 0.1s;
+    }
+    input[type="text"]::placeholder { color: #94a3b8; }
+    input[type="text"]:focus { outline: none; border-color: #2E8B57; box-shadow: 0 0 0 3px rgba(46,139,87,0.15); }
+    input[type="text"].valid { border-color: #16a34a; box-shadow: 0 0 0 3px rgba(22,163,74,0.15); }
+    input[type="text"].invalid { border-color: #ef4444; box-shadow: 0 0 0 3px rgba(239,68,68,0.15); }
+
+    .dark-mode input[type="text"] { background: #475569; color: #f1f5f9; border-color: #64748b; }
+    .dark-mode input[type="text"]:focus { border-color: #3CB371; box-shadow: 0 0 0 3px rgba(60,179,113,0.25); }
+
+    .hint { font-size: 0.9rem; margin-top: 8px; color: #64748b; display: flex; align-items: center; gap: 6px; }
+    .hint i { font-size: 0.9rem; }
+    .hint.ok { color: #16a34a; }
+    .hint.err { color: #ef4444; }
+    .dark-mode .hint { color: #94a3b8; }
+
+    /* Buttons */
+    .actions { margin-top: 1.4rem; }
+    button {
+      width: 100%; padding: 12px 16px; border: none; border-radius: 12px; cursor: pointer;
+      background: linear-gradient(135deg, #2E8B57, #3CB371); color: #fff; font-weight: 700; letter-spacing: 0.2px;
+      box-shadow: 0 6px 14px rgba(46,139,87,0.25); transition: transform 0.25s, box-shadow 0.25s; position: relative; overflow: hidden;
+    }
+    button:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(46,139,87,0.35); }
+    .dark-mode button { background: linear-gradient(135deg, #3CB371, #2E8B57); }
+
+    /* Button shimmer */
+    button::after { content: ''; position: absolute; inset: 0; transform: translateX(-100%) skewX(-20deg); background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent); }
+    button:hover::after { transform: translateX(100%) skewX(-20deg); transition: transform 0.6s ease; }
+
+    /* Ripple on click */
+    .ripple { position: absolute; border-radius: 50%; background: rgba(255,255,255,0.5); transform: scale(0); animation: ripple 600ms ease-out; pointer-events: none; }
+    @keyframes ripple { to { transform: scale(12); opacity: 0; } }
+
+    /* Loading state */
+    button.loading { pointer-events: none; opacity: 0.9; }
+    button .spinner { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.6); border-top-color: #fff; border-radius: 50%; display: inline-block; vertical-align: middle; margin-right: 8px; animation: spin 0.9s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Animations */
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.07); } 100% { transform: scale(1); } }
+    @keyframes shimmer { to { background-position: 200% center; } }
+    @keyframes fieldIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #e2e8f0; border-radius: 10px; }
+    ::-webkit-scrollbar-thumb { background: #2E8B57; border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: #1F6B48; }
+    .dark-mode ::-webkit-scrollbar-track { background: #475569; }
+    .dark-mode ::-webkit-scrollbar-thumb { background: #3CB371; }
+
+    /* Responsive */
+    @media (max-width: 520px) { .container { margin: 0 12px; padding: 1.6rem 1rem 1.2rem; } }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      .shape, button::after, .ripple, .spinner, h1, .container, .form-group { animation: none !important; transition: none !important; }
+    }
+  </style>
 </head>
 <body>
-  <h1>UPI Payment</h1>
-  <p>Product: {{ product.title }}</p>
-  <p>Amount: ₹{{ product.price }}</p>
+  <!-- Theme toggle -->
+  <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode" style="position:fixed;top:20px;right:20px;z-index:5;width:50px;height:50px;border-radius:50%;border:none;display:grid;place-items:center;background:linear-gradient(135deg,#f1f5f9,#e2e8f0);box-shadow:0 4px 15px rgba(0,0,0,0.1);cursor:pointer;transition:transform .3s,box-shadow .3s;"><i class="fas fa-moon" style="font-size:1.3rem;color:#4b5563;"></i></button>
 
-  <form method="POST">
-    <label>Enter UPI ID:</label>
-    <input type="text" name="upi_id" required>
-    <button type="submit">Proceed</button>
-  </form>
+  <!-- Floating shapes background -->
+  <div class="floating-shapes" aria-hidden="true">
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+  </div>
+
+  <div class="container" role="region" aria-labelledby="title">
+    <div class="brand" aria-hidden="true">
+      <i class="fas fa-leaf logo"></i>
+      <span class="text">EcoFinds</span>
+    </div>
+
+    <h1 id="title">UPI Payment</h1>
+    <p class="meta">Secure UPI checkout · Powered by EcoFinds</p>
+
+    <div class="meta" style="margin-top: -0.4rem;">
+      <p>Product: <strong>{{ product.title }}</strong></p>
+      <p>Amount: <strong>₹{{ product.price }}</strong></p>
+    </div>
+
+    <form method="POST" id="upi-form" novalidate>
+      <div class="form-group">
+        <label for="upi_id" style="font-weight:600; color:#374151;" class="label">Enter UPI ID</label>
+        <div class="input-with-icon">
+          <i class="fas fa-at" aria-hidden="true"></i>
+          <input type="text" id="upi_id" name="upi_id" placeholder="example@upi" inputmode="email" autocomplete="off" required pattern="^[A-Za-z0-9._-]{2,}@[A-Za-z]{2,}$" aria-describedby="upi-hint" />
+        </div>
+        <div class="hint" id="upi-hint"><i class="fas fa-info-circle"></i><span>Format: <code>name@bank</code> (e.g., <em>rahul@oksbi</em>)</span></div>
+      </div>
+
+      <div class="actions">
+        <button type="submit" id="pay-btn"><span class="btn-text">Proceed</span></button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    // Theme toggle logic
+    const themeToggle = document.getElementById('theme-toggle');
+    const themeIcon = themeToggle.querySelector('i');
+    const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    const savedTheme = localStorage.getItem('theme');
+
+    function applyTheme(theme) {
+      const dark = theme === 'dark' || (!theme && prefersDarkScheme.matches);
+      document.body.classList.toggle('dark-mode', dark);
+      if (dark) {
+        themeIcon.classList.replace('fa-moon', 'fa-sun');
+        themeToggle.style.background = 'linear-gradient(135deg,#475569,#374151)';
+        themeIcon.style.color = '#e2e8f0';
+      } else {
+        themeIcon.classList.replace('fa-sun', 'fa-moon');
+        themeToggle.style.background = 'linear-gradient(135deg,#f1f5f9,#e2e8f0)';
+        themeIcon.style.color = '#4b5563';
+      }
+    }
+    applyTheme(savedTheme);
+    themeToggle.addEventListener('click', () => {
+      const next = document.body.classList.contains('dark-mode') ? 'light' : 'dark';
+      localStorage.setItem('theme', next);
+      applyTheme(next);
+    });
+
+    // UPI validation + live feedback
+    const upiInput = document.getElementById('upi_id');
+    const upiHint = document.getElementById('upi-hint');
+    const pattern = /^[A-Za-z0-9._-]{2,}@[A-Za-z]{2,}$/;
+
+    function setHint(state, msg, icon) {
+      upiHint.classList.remove('ok', 'err');
+      if (state) upiHint.classList.add('ok'); else upiHint.classList.add('err');
+      upiHint.innerHTML = `<i class="fas ${icon}"></i><span>${msg}</span>`;
+    }
+
+    function validateUPI() {
+      const val = upiInput.value.trim();
+      if (!val) {
+        upiInput.classList.remove('valid', 'invalid');
+        setHint(false, 'Format: name@bank (e.g., rahul@oksbi)', 'fa-info-circle');
+        return false;
+      }
+      if (pattern.test(val)) {
+        upiInput.classList.add('valid');
+        upiInput.classList.remove('invalid');
+        setHint(true, 'Looks good!', 'fa-check-circle');
+        return true;
+      } else {
+        upiInput.classList.add('invalid');
+        upiInput.classList.remove('valid');
+        setHint(false, 'Invalid UPI ID. Use format name@bank', 'fa-exclamation-triangle');
+        return false;
+      }
+    }
+
+    upiInput.addEventListener('input', validateUPI);
+
+    // Ripple effect on button
+    const payBtn = document.getElementById('pay-btn');
+    payBtn.addEventListener('click', function(e) {
+      const rect = this.getBoundingClientRect();
+      const ripple = document.createElement('span');
+      const size = Math.max(rect.width, rect.height);
+      ripple.className = 'ripple';
+      ripple.style.width = ripple.style.height = size + 'px';
+      ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
+      ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
+      this.appendChild(ripple);
+      setTimeout(() => ripple.remove(), 600);
+    });
+
+    // Submit handling: show spinner, keep native POST
+    const form = document.getElementById('upi-form');
+    form.addEventListener('submit', function(e) {
+      if (!validateUPI()) { e.preventDefault(); upiInput.focus(); return; }
+      // Show loading state (do not prevent default)
+      payBtn.classList.add('loading');
+      const span = document.createElement('span');
+      span.className = 'spinner';
+      const text = document.createElement('span');
+      text.className = 'btn-text';
+      text.textContent = 'Processing…';
+      payBtn.innerHTML = '';
+      payBtn.appendChild(span);
+      payBtn.appendChild(text);
+    });
+  </script>
 </body>
 </html>

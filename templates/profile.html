@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>My Profile | EcoFinds</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+
+  <style>
+    /* =============== THEME TOKENS (same set) =============== */
+    :root{
+      --bg:#f9fafb; --text:#1f2937; --muted:#6b7280;
+      --card:#ffffff; --border:#e5e7eb;
+
+      --primary:#2E8B57; --primary-2:#3CB371;
+      --accent:#3B82F6; --accent-2:#8B5CF6;
+
+      --shadow:0 8px 24px rgba(0,0,0,0.08);
+      --shadow-hover:0 12px 28px rgba(0,0,0,0.12);
+      --shape-opacity:.10;
+
+      --t-slow:.5s; --t-med:.3s; --t-fast:.2s;
+    }
+    .dark-mode{
+      --bg:#0f172a; --text:#e2e8f0; --muted:#94a3b8;
+      --card:#1e293b; --border:#475569;
+
+      --primary:#3CB371; --primary-2:#2E8B57;
+      --accent:#60a5fa; --accent-2:#a78bfa;
+
+      --shadow:0 8px 28px rgba(0,0,0,0.5);
+      --shadow-hover:0 16px 36px rgba(0,0,0,0.6);
+      --shape-opacity:.06;
+    }
+
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{
+      background:var(--bg); color:var(--text);
+      font-family:"Segoe UI",Tahoma,Geneva,Verdana,sans-serif;
+      min-height:100vh; display:flex; align-items:center; justify-content:center;
+      padding:3.5rem 1.25rem; transition:background var(--t-med),color var(--t-med);
+      position:relative; overflow-x:hidden;
+    }
+
+    /* Subtle eco background image */
+    body::before{
+      content:""; position:fixed; inset:0; z-index:-2;
+      background-image:url('https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&w=1770&q=80');
+      background-size:cover; background-position:center; opacity:.05;
+      transition:opacity var(--t-med);
+    }
+    .dark-mode::before{ opacity:.03; }
+
+    /* =============== FLOATING SHAPES (same animation) =============== */
+    .floating-shapes{ position:fixed; inset:0; z-index:-1; pointer-events:none; overflow:hidden;}
+    .shape{ position:absolute; border-radius:50%; opacity:var(--shape-opacity); filter:blur(2px);}
+    .shape-1{ width:160px;height:160px; background:var(--primary); top:8%; left:-60px; animation:float 16s infinite ease-in-out;}
+    .shape-2{ width:110px;height:110px; background:var(--accent); bottom:18%; right:-40px; animation:float 12s infinite ease-in-out 1s;}
+    .shape-3{ width:90px;height:90px; background:#F59E0B; top:52%; left:-20px; animation:float 18s infinite ease-in-out 2s;}
+    .shape-4{ width:70px;height:70px; background:var(--accent-2); top:25%; right:15%; animation:float 14s infinite ease-in-out 3s;}
+    @keyframes float{
+      0%,100%{transform:translateY(0) rotate(0) scale(1)}
+      33%{transform:translateY(-20px) rotate(5deg) scale(1.05)}
+      66%{transform:translateY(10px) rotate(-5deg) scale(.95)}
+    }
+
+    /* =============== PROFILE WRAPPER =============== */
+    .wrap{
+      width:100%; max-width:960px; display:grid; gap:1.5rem;
+      grid-template-columns: 1fr;
+      animation:fadeIn .6s ease forwards; opacity:0;
+    }
+    @keyframes fadeIn{
+      from{opacity:0; transform:translateY(20px)}
+      to{opacity:1; transform:translateY(0)}
+    }
+
+    /* Card */
+    .card{
+      background:var(--card); border:1px solid var(--border);
+      border-radius:18px; box-shadow:var(--shadow);
+      overflow:hidden; position:relative;
+      transition:transform var(--t-med), box-shadow var(--t-med);
+    }
+    .card:hover{ transform:translateY(-6px); box-shadow:var(--shadow-hover); }
+    .card__topbar{
+      height:6px; width:100%;
+      background:linear-gradient(90deg, var(--primary), var(--accent), var(--accent-2));
+    }
+    .card__body{ padding:2rem; }
+
+    /* Heading with accent underline */
+    .title{
+      font-size:1.9rem; font-weight:800; letter-spacing:.2px;
+      margin-bottom:1.25rem; color:var(--primary); position:relative; display:inline-block;
+    }
+    .title::after{
+      content:""; position:absolute; left:0; bottom:-8px; height:4px; width:48%;
+      background:linear-gradient(90deg, var(--primary), var(--primary-2));
+      border-radius:2px;
+    }
+
+    /* Avatar */
+    .avatar{
+      width:96px; height:96px; border-radius:50%; display:grid; place-items:center;
+      background:linear-gradient(135deg, var(--primary), var(--primary-2));
+      color:#fff; font-size:2rem; font-weight:700; box-shadow:var(--shadow);
+      border:3px solid color-mix(in srgb, var(--card) 80%, transparent);
+      margin-bottom:1rem;
+    }
+    .header-row{
+      display:flex; align-items:center; gap:1.25rem; flex-wrap:wrap; margin-bottom:1rem;
+    }
+    .header-meta{
+      color:var(--muted); font-size:.95rem;
+    }
+
+    /* Info list */
+    .info{
+      display:grid; gap:1rem; margin-top:1rem;
+    }
+    .info__row{
+      display:flex; align-items:center; gap:.75rem; padding: .85rem 1rem;
+      background:color-mix(in srgb, var(--card) 90%, var(--border));
+      border:1px solid var(--border); border-radius:12px;
+      transition:transform var(--t-fast), box-shadow var(--t-fast), border-color var(--t-fast);
+    }
+    .info__row:hover{
+      transform:translateY(-2px);
+      box-shadow:0 6px 14px rgba(0,0,0,0.08);
+      border-color: color-mix(in srgb, var(--primary) 40%, var(--border));
+    }
+    .info__icon{
+      width:36px; height:36px; border-radius:10px; display:grid; place-items:center;
+      background:linear-gradient(135deg, var(--primary), var(--primary-2));
+      color:#fff; flex:0 0 auto;
+    }
+    .info__label{ font-weight:600; color:var(--text); }
+    .info__value{ color:var(--muted); }
+
+    /* Actions */
+    .actions{
+      margin-top:1.25rem; display:flex; gap:.8rem; flex-wrap:wrap;
+    }
+    .btn{
+      border:none; cursor:pointer; font-weight:700;
+      padding:.9rem 1.35rem; border-radius:12px;
+      transition:transform var(--t-med), box-shadow var(--t-med), opacity var(--t-med);
+      box-shadow:0 4px 10px rgba(0,0,0,0.1);
+    }
+    .btn--primary{
+      color:#fff; background:linear-gradient(135deg, var(--primary), var(--primary-2));
+    }
+    .btn--ghost{
+      background:transparent; color:var(--primary); border:2px solid var(--primary);
+    }
+    .btn:hover{ transform:translateY(-3px); box-shadow:0 10px 22px color-mix(in srgb, var(--primary) 35%, transparent); }
+    .btn:active{ transform:translateY(0); opacity:.9; }
+
+    /* Back link styled like button */
+    .back{
+      display:inline-flex; align-items:center; gap:.5rem; text-decoration:none;
+      margin-top:1.25rem; font-weight:700; color:#fff;
+      background:linear-gradient(135deg, var(--primary), var(--primary-2));
+      padding:.85rem 1.2rem; border-radius:12px; box-shadow:0 4px 10px rgba(0,0,0,0.1);
+      transition:transform var(--t-med), box-shadow var(--t-med);
+    }
+    .back:hover{ transform:translateY(-3px); box-shadow:0 10px 22px color-mix(in srgb, var(--primary) 35%, transparent); }
+
+    /* Theme Toggle (same as other pages) */
+    .theme-toggle{
+      position:fixed; bottom:28px; right:28px; width:54px; height:54px;
+      border-radius:50%; border:none; display:grid; place-items:center; cursor:pointer;
+      background:linear-gradient(135deg, var(--card), color-mix(in srgb, var(--card) 90%, transparent));
+      box-shadow:var(--shadow); transition:all var(--t-med); z-index:10;
+    }
+    .theme-toggle:hover{ transform:scale(1.1) rotate(15deg); box-shadow:var(--shadow-hover); }
+    .theme-toggle i{ font-size:1.3rem; color:var(--primary); transition:transform var(--t-med); }
+    .dark-mode .theme-toggle i{ color:var(--accent); }
+
+    /* Scrollbar (consistent) */
+    ::-webkit-scrollbar{ width:10px; }
+    ::-webkit-scrollbar-track{ background:var(--bg); }
+    ::-webkit-scrollbar-thumb{ background:var(--primary); border-radius:5px; }
+    ::-webkit-scrollbar-thumb:hover{ background:var(--primary-2); }
+    .dark-mode ::-webkit-scrollbar-thumb{ background:var(--accent); }
+    .dark-mode ::-webkit-scrollbar-thumb:hover{ background:var(--accent-2); }
+
+    /* Responsive */
+    @media (min-width:720px){
+      .wrap{ grid-template-columns: 1fr 1fr; }
+      .card__body{ padding:2.2rem; }
+    }
+    @media (max-width:480px){
+      .avatar{ width:84px;height:84px; font-size:1.6rem; }
+      .title{ font-size:1.6rem; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Floating Background Shapes -->
+  <div class="floating-shapes" aria-hidden="true">
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+    <div class="shape shape-4"></div>
+  </div>
+
+  <main class="wrap">
+    <!-- Profile Card -->
+    <section class="card" style="grid-column:1 / -1;">
+      <div class="card__topbar"></div>
+      <div class="card__body">
+        <div class="header-row">
+          <div class="avatar">
+            <i class="fas fa-user"></i>
+          </div>
+          <div>
+            <h1 class="title">My Profile</h1>
+            <div class="header-meta">Manage your EcoFinds identity & account details</div>
+          </div>
+        </div>
+
+        <div class="info">
+          <div class="info__row">
+            <div class="info__icon"><i class="fas fa-id-card"></i></div>
+            <div>
+              <div class="info__label">Name</div>
+              <div class="info__value">{{ user.name }}</div>
+            </div>
+          </div>
+
+          <div class="info__row">
+            <div class="info__icon"><i class="fas fa-envelope"></i></div>
+            <div>
+              <div class="info__label">Email</div>
+              <div class="info__value">{{ user.email }}</div>
+            </div>
+          </div>
+
+          <div class="info__row">
+            <div class="info__icon"><i class="fas fa-calendar-check"></i></div>
+            <div>
+              <div class="info__label">Joined On</div>
+              <div class="info__value">{{ user.created_at if user.created_at else "N/A" }}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <a class="back" href="{{ url_for('dashboard') }}"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+          <!-- Example action buttons (optional) -->
+          <!-- <button class="btn btn--primary" type="button"><i class="fas fa-pen"></i> Edit Profile</button>
+          <button class="btn btn--ghost" type="button"><i class="fas fa-lock"></i> Change Password</button> -->
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Theme Toggle -->
+  <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">
+    <i class="fas fa-moon"></i>
+  </button>
+
+  <script>
+    // Theme toggle (same logic used elsewhere)
+    const toggle = document.getElementById('theme-toggle');
+    const icon = toggle.querySelector('i');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+    const stored = localStorage.getItem('theme');
+
+    function applyTheme(mode){
+      const dark = mode === 'dark' || (!mode && prefersDark.matches);
+      document.body.classList.toggle('dark-mode', dark);
+      icon.classList.replace(dark ? 'fa-moon' : 'fa-sun', dark ? 'fa-sun' : 'fa-moon');
+    }
+    applyTheme(stored);
+
+    toggle.addEventListener('click', ()=>{
+      const next = document.body.classList.contains('dark-mode') ? 'light' : 'dark';
+      localStorage.setItem('theme', next);
+      applyTheme(next);
+    });
+  </script>
+</body>
+</html>
